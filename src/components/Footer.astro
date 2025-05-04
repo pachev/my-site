@@ -1,0 +1,31 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer>
+  <div class="footer-container">
+    <p>Copyright 2017-{currentYear} Pachev Joseph</p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    background-color: var(--color-primary);
+    padding: var(--space-md) 0;
+    margin-top: auto;
+    text-align: center;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+</style>

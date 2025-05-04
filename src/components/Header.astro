@@ -1,0 +1,85 @@
+---
+import SocialIcons from './SocialIcons.astro';
+---
+
+<header>
+  <div class="header-container">
+    <nav>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/posts">Posts</a></li>
+        <li><a href="https://github.com/pachev" target="_blank">Projects</a></li>
+        <li><a href="https://linkedin.com/in/pachev" target="_blank">Resume</a></li>
+      </ul>
+    </nav>
+    <SocialIcons />
+  </div>
+</header>
+
+<style>
+  header {
+    background-color: var(--color-primary);
+    padding: var(--space-xs) 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: var(--space-md);
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+
+  .nav-links a {
+    color: #777;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 0;
+    position: relative;
+    line-height: 32px; /* Match the height of social icons */
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-accent);
+    transition: width 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-accent);
+  }
+
+  .nav-links a:hover::after {
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .header-container {
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .nav-links {
+      gap: var(--space-sm);
+    }
+  }
+</style>

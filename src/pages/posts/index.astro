@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all blog posts that aren't drafts
+const allPosts = await getCollection('blog', ({ data }) => {
+  return !data.draft;
+});
+
+// Sort posts by date (newest first)
+const posts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<Layout title="Posts | Pachev Joseph" description="Posts by Pachev Joseph on software engineering, technology, and more.">
+  <section class="blog-header">
+    <h1>Posts</h1>
+    <p>Thoughts, tutorials, and insights on software engineering and tech</p>
+  </section>
+
+  <section class="posts">
+    {posts.map(post => (
+      <article class="post-card card">
+        <div class="post-content">
+          <h2><a href={`/posts/${post.slug}`}>{post.data.title}</a></h2>
+          <p class="post-date">{formatDate(post.data.date)}</p>
+          {post.data.tags && post.data.tags.length > 0 && (
+            <div class="post-tags">
+              {post.data.tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+          <p class="post-excerpt">{post.data.description}</p>
+          <a href={`/posts/${post.slug}`} class="read-more">Read more →</a>
+        </div>
+      </article>
+    ))}
+  </section>
+</Layout>
+
+<style>
+  .blog-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .blog-header h1 {
+    font-size: 3rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .blog-header p {
+    color: var(--color-muted);
+    font-size: 1.2rem;
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .post-content {
+    flex: 1;
+  }
+
+  .post-date {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .post-excerpt {
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .read-more {
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .blog-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .blog-header p {
+      font-size: 1rem;
+    }
+  }
+</style>
