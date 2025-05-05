@@ -26,3 +26,4 @@ This is a personal portfolio website built with Astro. It uses TypeScript and MD
 - **Types:** Adhere to strict TypeScript typing. Define types where appropriate.
 - **Error Handling:** Use standard JavaScript/TypeScript error handling (try/catch).
 - **Components:** Astro components (`.astro`) are used for UI structure and layout.
+- **Styles:** CSS modules or global styles can be used. Check for any existing styles in the project.
