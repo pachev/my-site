@@ -1,0 +1,144 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatDistance } from 'date-fns';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const tils = await getCollection('til');
+  
+  return tils.map(til => ({
+    params: { slug: til.slug },
+    props: { til },
+  }));
+}
+
+const { til } = Astro.props;
+const { Content } = await til.render();
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(til.data.date);
+
+const timeAgo = formatDistance(til.data.date, new Date(), { addSuffix: true });
+---
+
+<Layout title={`${til.data.title} | Pachev Joseph`} description={`${til.data.title} - Today I Learned from Pachev Joseph`}>
+  <article class="til-post">
+    <div class="til-header">
+      <h1>{til.data.title}</h1>
+      <div class="til-meta">
+        <time datetime={til.data.date.toISOString()}>{formattedDate}</time>
+        <span class="time-ago">({timeAgo})</span>
+      </div>
+      
+      {til.data.tags && til.data.tags.length > 0 && (
+        <div class="til-tags">
+          {til.data.tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="til-content">
+      <Content />
+    </div>
+    
+    <div class="til-footer">
+      <div class="til-nav">
+        <a href="/tils" class="btn">← Back to TIL</a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .til-post {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .til-header {
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+  
+  .til-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .til-meta {
+    color: var(--color-muted);
+    font-size: 1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .time-ago {
+    font-style: italic;
+  }
+
+  .til-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  .til-content {
+    line-height: 1.7;
+    font-size: 1.1rem;
+  }
+  
+  .til-content :global(pre) {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .til-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .til-content :global(code) {
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.07);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .til-footer {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .til-nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .til-content {
+      font-size: 1rem;
+    }
+  }
+</style>

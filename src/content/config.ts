@@ -12,8 +12,8 @@ const blogCollection = defineCollection({
   }),
 });
 
-// Define a schema for TLDR posts
-const tldrCollection = defineCollection({
+// Define a schema for TIL (Today I Learned) posts
+const tilCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
@@ -26,5 +26,5 @@ const tldrCollection = defineCollection({
 // Export a single `collections` object to register your collection(s)
 export const collections = {
   'blog': blogCollection,
-  'tldr': tldrCollection,
+  'til': tilCollection,
 };
