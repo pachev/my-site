@@ -1,0 +1,264 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all TLDR posts that aren't drafts
+const allTldrs = await getCollection('tldr', ({ data }) => {
+  return !data.draft;
+});
+
+// Sort posts by date (newest first)
+const tldrs = allTldrs.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+
+// Get all unique tags
+const allTags = [...new Set(tldrs.flatMap(tldr => tldr.data.tags))].sort();
+---
+
+<Layout title="TLDRs | Pachev Joseph" description="Quick notes and tips from Pachev Joseph">
+  <section class="tldr-header">
+    <h1>TLDRs</h1>
+    <p>Quick notes, tips, and things I learned</p>
+  </section>
+
+  <div class="container">
+    <aside class="tag-filter">
+      <h2>Filter by tag</h2>
+      <div class="tag-list">
+        <button class="tag-button active" data-tag="all">All</button>
+        {allTags.map(tag => (
+          <button class="tag-button" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    </aside>
+
+    <section class="tldrs">
+      {tldrs.map(tldr => (
+        <article class="tldr-card card" data-tags={tldr.data.tags.join(',')}>
+          <div class="tldr-content">
+            <h2 class="tldr-title"><a href={`/tldrs/${tldr.slug}`}>{tldr.data.title}</a></h2>
+            <div class="tldr-meta">
+              <time datetime={tldr.data.date.toISOString()}>{formatDate(tldr.data.date)}</time>
+              {tldr.data.tags && tldr.data.tags.length > 0 && (
+                <div class="tldr-tags">
+                  {tldr.data.tags.map(tag => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <a href={`/tldrs/${tldr.slug}`} class="tldr-link">
+              <div class="tldr-preview">
+                <a href={`/tldrs/${tldr.slug}`} class="read-more">Read full TLDR →</a>
+              </div>
+            </a>
+          </div>
+        </article>
+      ))}
+    </section>
+  </div>
+</Layout>
+
+<script>
+  // Tag filtering logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const tagButtons = document.querySelectorAll('.tag-button');
+    const tldrCards = document.querySelectorAll('.tldr-card');
+    
+    tagButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        tagButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+        
+        const selectedTag = button.getAttribute('data-tag');
+        
+        // Show all cards if 'all' is selected
+        if (selectedTag === 'all') {
+          tldrCards.forEach(card => {
+            card.style.display = 'block';
+          });
+          return;
+        }
+        
+        // Filter cards based on selected tag
+        tldrCards.forEach(card => {
+          const cardTags = card.getAttribute('data-tags').split(',');
+          if (cardTags.includes(selectedTag)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .tldr-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .tldr-header h1 {
+    font-size: 3rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .tldr-header p {
+    color: var(--color-muted);
+    font-size: 1.2rem;
+  }
+  
+  .container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .tag-filter {
+    position: sticky;
+    top: var(--space-lg);
+    align-self: start;
+  }
+  
+  .tag-filter h2 {
+    margin-bottom: var(--space-md);
+    font-size: 1.5rem;
+  }
+  
+  .tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  
+  .tag-button {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: var(--space-xs);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .tag-button:hover {
+    background-color: var(--color-bg-hover);
+  }
+  
+  .tag-button.active {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  .tldrs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .tldr-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tldr-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .tldr-content {
+    flex: 1;
+  }
+  
+  .tldr-title {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-xs);
+  }
+  
+  .tldr-title a {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .tldr-title a:hover {
+    color: var(--color-accent);
+  }
+  
+  .tldr-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .tldr-meta time {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .tldr-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+  
+  .tldr-preview {
+    margin-top: var(--space-sm);
+  }
+  
+  .read-more {
+    font-weight: 600;
+    display: inline-block;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    
+    .tag-filter {
+      position: static;
+      margin-bottom: var(--space-md);
+    }
+    
+    .tag-list {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    
+    .tldr-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .tldr-header p {
+      font-size: 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,144 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatDistance } from 'date-fns';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const tldrs = await getCollection('tldr');
+  
+  return tldrs.map(tldr => ({
+    params: { slug: tldr.slug },
+    props: { tldr },
+  }));
+}
+
+const { tldr } = Astro.props;
+const { Content } = await tldr.render();
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(tldr.data.date);
+
+const timeAgo = formatDistance(tldr.data.date, new Date(), { addSuffix: true });
+---
+
+<Layout title={`${tldr.data.title} | Pachev Joseph`} description={`${tldr.data.title} - A quick note from Pachev Joseph`}>
+  <article class="tldr-post">
+    <div class="tldr-header">
+      <h1>{tldr.data.title}</h1>
+      <div class="tldr-meta">
+        <time datetime={tldr.data.date.toISOString()}>{formattedDate}</time>
+        <span class="time-ago">({timeAgo})</span>
+      </div>
+      
+      {tldr.data.tags && tldr.data.tags.length > 0 && (
+        <div class="tldr-tags">
+          {tldr.data.tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="tldr-content">
+      <Content />
+    </div>
+    
+    <div class="tldr-footer">
+      <div class="tldr-nav">
+        <a href="/tldrs" class="btn">← Back to TLDRs</a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .tldr-post {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .tldr-header {
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+  
+  .tldr-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .tldr-meta {
+    color: var(--color-muted);
+    font-size: 1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .time-ago {
+    font-style: italic;
+  }
+
+  .tldr-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  .tldr-content {
+    line-height: 1.7;
+    font-size: 1.1rem;
+  }
+  
+  .tldr-content :global(pre) {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .tldr-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .tldr-content :global(code) {
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.07);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .tldr-footer {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .tldr-nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .tldr-content {
+      font-size: 1rem;
+    }
+  }
+</style>

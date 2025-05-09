@@ -12,7 +12,19 @@ const blogCollection = defineCollection({
   }),
 });
 
+// Define a schema for TLDR posts
+const tldrCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false)
+  }),
+});
+
 // Export a single `collections` object to register your collection(s)
 export const collections = {
   'blog': blogCollection,
+  'tldr': tldrCollection,
 };
