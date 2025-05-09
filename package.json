@@ -8,9 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "new:post": "bun ./scripts/newPost.ts",
-    "new:tldr": "bun ./scripts/newTldr.ts"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/mdx": "^2.1.1",
