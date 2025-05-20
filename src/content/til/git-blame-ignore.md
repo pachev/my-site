@@ -1,6 +1,6 @@
 ---
 title: "Excluding commits from git blame"
-date: 2024-05-07
+date: 2025-05-07
 tags: ["git", "tips", "development"]
 ---
 
