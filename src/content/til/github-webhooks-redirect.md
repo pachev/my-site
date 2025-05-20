@@ -1,6 +1,6 @@
 ---
 title: "Github Apps Webhooks Don't Follow Redirects"
-date: 2024-05-09
+date: 2025-05-09
 tags: ["git", "github", "tips", "development", "webhooks"]
 ---
 
