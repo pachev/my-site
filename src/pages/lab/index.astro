@@ -1,0 +1,234 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all lab posts that aren't drafts
+const allPosts = await getCollection('lab', ({ data }) => {
+  return !data.draft;
+});
+
+// Sort posts by date (newest first)
+const posts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<Layout title="Home Lab Journal | Pachev Joseph" description="Home Lab Journal by Pachev Joseph on infrastructure, server setups, and technology experiments.">
+  <section class="lab-header">
+    <h1>Home Lab Journal</h1>
+    <p>Documentation, updates, and learnings from my home lab experiments</p>
+  </section>
+
+  <section class="current-setup">
+    <div class="card">
+      <h2>Current Setup</h2>
+      <div class="setup-details">
+        <div class="setup-grid">
+          <div class="setup-item">
+            <h3>Compute</h3>
+            <p>Three mini PCs (all Proxmox nodes):</p>
+            <ul>
+              <li><em>EQ14</em> (Intel N150): Home Assistant, security cameras, Coral TPU</li>
+              <li><em>S13</em> (Intel N150): Dedicated Plex server with HW transcoding</li>
+              <li><em>Beelink SER5 Pro</em>: Hosts Coolify</li>
+            </ul>
+          </div>
+          
+          <div class="setup-item">
+            <h3>Storage</h3>
+            <p>Custom built NAS:</p>
+            <ul>
+              <li>Fractal Node 304 case</li>
+              <li>4x HDDs in ZFS pool</li>
+              <li>4TB usable storage</li>
+              <li>Running Ubuntu Server</li>
+            </ul>
+          </div>
+          
+          <div class="setup-item">
+            <h3>Software</h3>
+            <ul>
+              <li>Proxmox VE on compute nodes</li>
+              <li>Ubuntu + ZFS on NAS</li>
+              <li>Key services: Home Assistant, Frigate, Plex, Coolify</li>
+              <li><code>-ARR</code> stack for media management</li>
+            </ul>
+          </div>
+          
+          <div class="setup-item">
+            <h3>Network</h3>
+            <ul>
+              <li>Stock ATT gateway (expanded subnet mask)</li>
+              <li>Cloudflare Tunnels for external access</li>
+            </ul>
+          </div>
+        </div>
+        <p class="setup-footer">I'll keep this section updated as it changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="posts">
+    {posts.map(post => (
+      <article class="post-card card">
+        <div class="post-content">
+          <h2><a href={`/lab/${post.slug}`}>{post.data.title}</a></h2>
+          <p class="post-date">{formatDate(post.data.date)}</p>
+          {post.data.tags && post.data.tags.length > 0 && (
+            <div class="post-tags">
+              {post.data.tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+          <p class="post-excerpt">{post.data.description}</p>
+          <a href={`/lab/${post.slug}`} class="read-more">Read more →</a>
+        </div>
+      </article>
+    ))}
+  </section>
+</Layout>
+
+<style>
+  .lab-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+  }
+
+  .lab-header h1 {
+    font-size: 3rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .lab-header p {
+    color: var(--color-muted);
+    font-size: 1.2rem;
+  }
+
+  .current-setup {
+    max-width: 800px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .setup-details {
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin: var(--space-md) 0;
+  }
+
+  .setup-item {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: var(--space-md);
+  }
+
+  .setup-item h3 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: var(--space-xs);
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-xs);
+  }
+
+  .setup-item p {
+    margin: var(--space-xs) 0;
+  }
+  
+  .setup-item ul {
+    margin: var(--space-xs) 0;
+    padding-left: 1.5rem;
+  }
+  
+  .setup-item li {
+    margin-bottom: 0.35rem;
+  }
+
+  .setup-footer {
+    text-align: center;
+    font-style: italic;
+    margin-top: var(--space-md);
+    color: var(--color-muted);
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .post-content {
+    flex: 1;
+  }
+
+  .post-date {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .post-excerpt {
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .read-more {
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .lab-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .lab-header p {
+      font-size: 1rem;
+    }
+    
+    .setup-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

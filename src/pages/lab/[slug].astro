@@ -1,0 +1,148 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatDistance } from 'date-fns';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('lab');
+  
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(post.data.date);
+
+const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
+---
+
+<Layout title={`${post.data.title} | Pachev Joseph's Home Lab Journal`} description={post.data.description}>
+  <article class="lab-post">
+    <div class="post-header">
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+        <span class="time-ago">({timeAgo})</span>
+      </div>
+      
+      {post.data.tags && post.data.tags.length > 0 && (
+        <div class="post-tags">
+          {post.data.tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="post-content">
+      <Content />
+    </div>
+    
+    <div class="post-footer">
+      <div class="post-nav">
+        <a href="/lab" class="btn">← Back to Home Lab Journal</a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .lab-post {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .post-header {
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+
+  .post-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .post-meta {
+    color: var(--color-muted);
+    font-size: 1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .time-ago {
+    font-style: italic;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  .post-content {
+    line-height: 1.7;
+    font-size: 1.1rem;
+  }
+  
+  .post-content :global(pre) {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .post-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .post-content :global(code) {
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.07);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .post-footer {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 2rem;
+    }
+    
+    .post-content {
+      font-size: 1rem;
+    }
+  }
+</style>

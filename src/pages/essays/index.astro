@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all essay posts that aren't drafts
+const allPosts = await getCollection('essays', ({ data }) => {
+  return !data.draft;
+});
+
+// Sort posts by date (newest first)
+const posts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<Layout title="Essays | Pachev Joseph" description="Essays by Pachev Joseph on technology, philosophy, and personal reflections.">
+  <section class="essays-header">
+    <h1>Essays</h1>
+    <p>Ideas out of my head, somewhat structured.</p>
+  </section>
+
+  <section class="posts">
+    {posts.map(post => (
+      <article class="post-card card">
+        <div class="post-content">
+          <h2><a href={`/essays/${post.slug}`}>{post.data.title}</a></h2>
+          <p class="post-date">{formatDate(post.data.date)}</p>
+          {post.data.tags && post.data.tags.length > 0 && (
+            <div class="post-tags">
+              {post.data.tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+          <p class="post-excerpt">{post.data.description}</p>
+          <a href={`/essays/${post.slug}`} class="read-more">Read more →</a>
+        </div>
+      </article>
+    ))}
+  </section>
+</Layout>
+
+<style>
+  .essays-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .essays-header h1 {
+    font-size: 3rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .essays-header p {
+    color: var(--color-muted);
+    font-size: 1.2rem;
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .post-content {
+    flex: 1;
+  }
+
+  .post-date {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .post-excerpt {
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .read-more {
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    background-color: var(--color-accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .essays-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .essays-header p {
+      font-size: 1rem;
+    }
+  }
+</style>

@@ -8,10 +8,10 @@ This is a personal portfolio website built with Astro. It uses TypeScript and MD
 
 ## Commands
 
-- **Development:** `bun run dev` or `bun start`
-- **Build:** `bun run build`
-- **Preview Build:** `bun run preview`
-- **Astro CLI:** `bun run astro -- <astro_command>` (e.g., `bun run astro -- add react`)
+- **Development:** `npm run dev`
+- **Build:** `npm run build`
+- **Preview Build:** `npm run preview`
+- **Astro CLI:** `npm run astro -- <astro_command>` (e.g., `npm run astro -- add react`)
 
 *Note: Linting and testing commands are not explicitly defined in `package.json`.*
 
