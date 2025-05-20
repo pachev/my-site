@@ -144,7 +144,7 @@ https://discordapp.com/oauth2/authorize?client_id=INSERT_CLIENT_ID_HERE&scope=bo
 Now that you have a server and the bot is invited to the server with read and write message permissions, we can extend the
 functionality of the bot. To start, we'll add a ping command then add more along the way.
 
-we do this by adding this command to our `bot.py` file. The file should look lie below:
+we do this by adding this command to our `bot.py` file. The file should look like below:
 
 ```python
 from os import getenv
@@ -409,7 +409,7 @@ Thanks for reading :D
 [8]: https://pypi.python.org/pypi/tabulate
 [9]: https://www.sqlalchemy.org/
 [10]: https://www.sqlite.org/index.html
-[11]: https://www.google.com/search?q=tutorial+how+ot+set+up+environmental+variables&oq=tutorial+how+ot+set+up+environmental+variables
+[11]: https://www.google.com/search?q=tutorial+how+to+set+up+environmental+variables&oq=tutorial+how+to+set+up+environmental+variables
 [12]: https://discordapp.com/channels/@me
 [13]: https://discordapi.com/permissions.html
 [logo]: /images/posts/python-discord-bot/discord-developer.png

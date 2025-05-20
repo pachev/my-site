@@ -1,7 +1,7 @@
 ---
 title: "Building a GUI for simonw's files-to-prompt"
 date: 2025-05-12T09:00:00-08:00
-description: "How I built a visual interface for files-to-prompt using Python, uv, ruff, and two fo the big LLMs"
+description: "How I built a visual interface for files-to-prompt using Python, uv, ruff, and two of the big LLMs"
 tags: ["python", "llm", "tools", "side-projects"]
 draft: false
 ---
@@ -44,7 +44,7 @@ The speed difference was noticeable, especially when setting up the initial envi
 
 ### ruff
 
-ruff is an extremely fast Python linter and formatter, replacing tools like flake8, black, isort, and more in a single tool. It's made by the same peopel who 
+ruff is an extremely fast Python linter and formatter, replacing tools like flake8, black, isort, and more in a single tool. It's made by the same people who 
 make uv. It was so fast that I had to add errors to make sure it was actually running. It's ridiculously fast. I configured it in my pyproject.toml:
 
 ```toml
@@ -148,7 +148,7 @@ I'd like to extend this tool with:
 ## Final Thoughts
 
 Building this thing was a perfect distraction from life and work :D. I'm excited about this era of coding where we can quickly build personalized tools that enhance our workflows.
-I really wasn't sure what license to put on thsi thing. I didn't actually use any of the code from either project but I did use them as inspriation. I'm assuming this means
+I really wasn't sure what license to put on this thing. I didn't actually use any of the code from either project but I did use them as inspiration. I'm assuming this means
 derivative work. I just copied over the license from files-to-prompt. If you think I should change it, please let me know.
 
 

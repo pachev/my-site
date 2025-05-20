@@ -58,17 +58,17 @@ such as "Why did you choose that variable name?" use to really annoy me, but now
 realized that in person, these would normally be said in better tones but they may not come across the
 same in text. Still, when I am commenting on code reviews, I always remember that another human is on
 the other side of those comments. I think more of us would do well to learn this. However, I've learned
-to no only not take these comments to heart but also that most developers are not really good at 
+to not only take these comments to heart but also that most developers are not really good at 
 communicating.
 
 ### F) I'm still just an employee
 
-It gets so easy for me  to fall into the trap of always trying to impress; it's just in my nature at this point. 
+It gets so easy for me to fall into the trap of always trying to impress; it's just in my nature at this point.
 But realistically no matter how impressive your code and work ethic are, at the end of the day, you are an 
 employee at a company. Even if you love creating software outside of work, you should actually spend those hours __outside__
 of work. The first six months felt like I needed to prove something, but I've come to terms with it. I was 
 even afraid to take PTO, but like everyone will tell you, taking a break is very important. Don't be afraid
-an use all those perks (PTO and such) to enjoy work and life. Work-life balance is important for your mental health.
+and use all those perks (PTO and such) to enjoy work and life. Work-life balance is important for your mental health.
 
 ---
 #### PS- Keep a work journal
