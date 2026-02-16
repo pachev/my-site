@@ -19,7 +19,7 @@ They have scripts for pretty much everything you'd want to run:
 - Paperless-ngx
 - And dozens more
 
-Usage is straightforward. SSH into your Proxmox host and run the script for whatever service you want:
+Usage is straightforward. Open a shell on your Proxmox host (either SSH in or use the Shell option in the Proxmox web UI) and run the script for whatever service you want:
 
 ```bash
 bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/homeassistant.sh)"
