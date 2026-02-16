@@ -8,7 +8,7 @@ draft: false
 
 ## The Goal
 
-In [Part 1] I covered getting a bare NixOS LXC running on Proxmox. That's great for a single container, but I wanted something more: a golden image I can clone in seconds that comes pre-loaded with my user, dev tools, SSH keys, and sensible defaults. Spin up a new project? Clone the template, set a hostname, done.
+In [Part 1] I covered getting a bare NixOS LXC running on Proxmox (I'm on version 8.4, check out my [/lab] for the full homelab setup). That's great for a single container, but I wanted something more: a golden image I can clone in seconds that comes pre-loaded with my user, dev tools, SSH keys, and sensible defaults. Spin up a new project? Clone the template, set a hostname, done.
 
 Here's how I built that.
 
@@ -16,7 +16,7 @@ Here's how I built that.
 
 I tried a few different paths before landing on one that actually works well:
 
-**nixos-generators** builds a tarball from a config file. Sounds perfect, but the resulting image doesn't include Nix channels (so `nixos-rebuild` fails), the `configuration.nix` isn't writable (it's a symlink into the Nix store), and you have to `scp` the tarball to your Proxmox host every time you rebuild. Too many friction points.
+**nixos-generators** builds a tarball from a config file. Sounds perfect, but the resulting image doesn't include Nix channels (so `nixos-rebuild` fails), the `configuration.nix` isn't writable (it's a symlink into the Nix store), and you have to `scp` the tarball to your Proxmox host every time you rebuild. Too many friction points. Mind you, it could be that I just don't know how to solve this at the time, and I'll update this post if I do, since I would've preferred this method.
 
 **Proxmox native templating** is way simpler. Configure a container exactly how you want it, stop it, back it up, and drop the backup in the template cache. Every node in your cluster can use it. The config file is writable. Channels work. Everything just behaves the way you'd expect.
 
@@ -69,7 +69,7 @@ pct push 900 /path/to/your-key.pub /root/your-key.pub
 
 ## The Configuration
 
-Now for the actual config. Here's what I'm using — it sets up an `appuser` with sudo, SSH key auth, fish shell, neovim, Docker, and a bunch of dev tools:
+Now for the actual config. Here's what I'm using. It sets up an `appuser` with sudo, SSH key auth, fish shell, neovim, Docker, and a bunch of dev tools:
 
 ```nix
 { modulesPath, config, pkgs, lib, ... }:
@@ -178,7 +178,7 @@ nano /etc/nixos/configuration.nix
 nixos-rebuild switch
 ```
 
-This takes a while since it's pulling down Docker, fish, and all the dev tools. Let it cook.
+This takes a while since it's pulling down Docker, fish, and all the dev tools.
 
 ## Quick Sanity Check
 
@@ -192,7 +192,7 @@ nvim --version
 
 ## Creating the Template
 
-Here's where things get interesting. You might think `pct template 900` is the answer, and it sort of is — but it creates a template that only works on the same storage. If you have multiple Proxmox nodes and want to clone from any of them, you need the template in the CT template cache on shared storage.
+Here's where things get interesting. You might think `pct template 900` is the answer, and it sort of is; but it creates a template that only works on the same storage. If you have multiple Proxmox nodes and want to clone from any of them, you need the template in the CT template cache on shared storage.
 
 The move that works across your whole cluster:
 
@@ -204,18 +204,18 @@ pct stop 900
 vzdump 900 --dumpdir /tmp --mode stop
 
 # Copy the backup to your shared template cache
-cp /tmp/vzdump-lxc-900-*.tar.zst \
-   /mnt/pve/proxmox-nfs/template/cache/nixos-appuser-template.tar.zst
+cp /tmp/vzdump-lxc-900-*.tar.xz \
+   /mnt/pve/proxmox-nfs/template/cache/nixos-appuser-template.tar.xz
 ```
 
-That `.tar.zst` file now shows up as a CT template on every node in your Proxmox cluster.
+That `.tar.xz` file now shows up as a CT template on every node in your Proxmox cluster.
 
 ## Spinning Up New Containers
 
 From any node in your cluster:
 
 ```bash
-pct create 201 proxmox-nfs:vztmpl/nixos-appuser-template.tar.zst \
+pct create 201 proxmox-nfs:vztmpl/nixos-appuser-template.tar.xz \
   --hostname my-app \
   --ostype unmanaged \
   --features nesting=1 \
@@ -242,16 +242,6 @@ ssh appuser@<ip>
 
 That's it. You've got a fully configured NixOS container with your user, tools, and SSH keys ready to go.
 
-## Networking: The DHCP + Reservation Trick
-
-You'll notice the config uses `useDHCP = lib.mkForce true` instead of a static IP. I tried hardcoding static IPs in the NixOS config, but that means every clone gets the same IP — not great.
-
-The `mkForce` is needed because the `proxmox-lxc.nix` module sets `useDHCP = false` internally, and NixOS doesn't let you redefine an option without explicitly overriding it.
-
-The better approach: let DHCP handle it, then set **DHCP reservations** on your router. Each container gets a unique MAC address from Proxmox (check it with `pct config 201 | grep net0`), so you tell your router "this MAC always gets this IP." The container uses DHCP, but always lands on a predictable address.
-
-Best of both worlds — no hardcoding in NixOS, but a stable IP for SSH.
-
 ## Customizing a Clone
 
 Since the `configuration.nix` is a real writable file (not a Nix store symlink), you can customize any clone:
@@ -267,7 +257,7 @@ The template is your starting point. Each clone is its own system from there.
 
 ## Updating the Template
 
-When you want to update your golden image — new packages, config changes, whatever:
+When you want to update your golden image (new packages, config changes, whatever):
 
 1. Create a new container from the template
 2. Make your changes, `nixos-rebuild switch`
@@ -282,8 +272,6 @@ A few things that weren't obvious going in:
 
 **nixos-generators is cool but fiddly.** The resulting images don't have channels, the config isn't editable, and you're fighting symlinks. For a homelab workflow, native Proxmox templating is way less friction.
 
-**The `proxmox-lxc.nix` import matters.** Don't import `lxc-container.nix` alongside it — they conflict on `system.build.tarball`. And don't forget `lib.mkForce` on `useDHCP` if you want DHCP.
-
 **`--ostype unmanaged` and `--cmode console` are non-negotiable.** Without these, you'll get a broken container that either won't boot or won't give you a console.
 
 **Shared storage makes everything easier.** If your template tarball is on NFS, every node can create containers from it. No copying, no syncing.
@@ -292,4 +280,5 @@ Thanks for reading :D
 
 -Pachev
 
-[Part 1]: /blog/nixos-proxmox-lxc-from-scratch
+[Part 1]: /posts/nixos-proxmox-lxc-from-scratch
+[/lab]: /lab

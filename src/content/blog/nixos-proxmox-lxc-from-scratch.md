@@ -8,11 +8,13 @@ draft: false
 
 ## Why NixOS in an LXC?
 
-I've been running Proxmox for a while now, and LXC containers are my go-to for lightweight services. They boot fast, use barely any resources, and you can spin up a dozen of them without breaking a sweat. But configuring them always felt like pets, not cattle — SSH in, `apt install` a bunch of stuff, tweak configs, and pray you remember what you did six months later.
+I've been running Proxmox for a while now (currently on version 8.4, see my [/lab] for the full setup), and LXC containers are my go-to for lightweight services. They boot fast, use barely any resources, and you can spin up as many as you want for your services. But configuring them each time can be a little time consuming. 
+
+There are some pre-configured LXCs found [here][3] that have helped me in the past. But for custom small services, the base ubuntu image has been my goto. But the pattern is usually, SSH in, `apt install` a bunch of stuff, tweak configs, and pray I remember what I did for the next custom service I want (I know ansible, and other tools exists, but I'm setting this up to make NixOS a hero).
 
 NixOS fixes that. Your entire system is declared in a single `configuration.nix` file. Want the same setup on a new container? Copy the file, rebuild, done. It's like infrastructure-as-code but for your actual OS.
 
-The problem? Getting NixOS running in a Proxmox LXC isn't exactly straightforward. The Proxmox GUI doesn't play nice with it, and there are a few gotchas that'll have you staring at a blank console wondering what went wrong.
+The problem is getting NixOS running in a Proxmox LXC isn't exactly straightforward. The Proxmox GUI doesn't play nice with it, and there are a few gotchas that'll have you staring at a blank console wondering what went wrong.
 
 Here's how to get it working.
 
@@ -45,7 +47,7 @@ You can also upload it through the Proxmox GUI under your storage → CT Templat
 
 ## Creating the Container
 
-Here's the important bit — **don't use the Proxmox GUI to create the container**. NixOS needs some specific flags that the GUI doesn't handle well. SSH into your Proxmox host and create it via CLI:
+You could use the PVE browser to create this, but I tend to use the CLI. SSH into your Proxmox host and create like so:
 
 ```bash
 pct create 100 local:vztmpl/nixos-24.11-lxc.tar.xz \
@@ -78,7 +80,7 @@ pct start 100
 pct enter 100
 ```
 
-You might see a blank screen — just hit Enter and the login prompt should appear. Log in as `root` with no password.
+You might see a blank screen. Just hit Enter and the login prompt should appear. Log in as `root` with no password.
 
 First thing, source the environment so your PATH is set up:
 
@@ -153,13 +155,13 @@ Apply it:
 nixos-rebuild switch
 ```
 
-This is going to take a while the first time — Nix is downloading and building everything. Grab some coffee.
+This is going to take a while the first time since Nix is downloading and building everything.
 
 ## The Import Gotcha
 
 One thing that tripped me up: the `proxmox-lxc.nix` import is important. This module sets `networking.useDHCP = false` internally, which is why we need `lib.mkForce true` to override it if you want DHCP. Without the import, you lose Proxmox-specific tweaks that make the container behave correctly.
 
-Also, don't import `lxc-container.nix` alongside `proxmox-lxc.nix` — they both try to define `system.build.tarball` and you'll get a conflict error about the option being defined multiple times.
+Also, don't import `lxc-container.nix` alongside `proxmox-lxc.nix`. They both try to define `system.build.tarball` and you'll get a conflict error about the option being defined multiple times.
 
 ## Console Not Working?
 
@@ -179,4 +181,6 @@ Thanks for reading :D
 -Pachev
 
 [Hydra]: https://hydra.nixos.org/project/nixos
-[Part 2]: /blog/nixos-proxmox-lxc-template
+[Part 2]: /posts/nixos-proxmox-lxc-template
+[3]: https://community-scripts.github.io/ProxmoxVE/scripts
+[/lab]: /lab
