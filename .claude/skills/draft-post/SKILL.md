@@ -13,18 +13,18 @@ Input: a path to a notes file (argument), or notes pasted in the conversation. I
 
 ## Steps
 
-1. **Resolve the slug.** Derive a kebab-case slug from the notes' topic, or use the one PJ gave. Confirm the slug with PJ only if it's ambiguous.
+1. **Resolve the slug and collection.** Derive a kebab-case slug from the notes' topic, or use the one PJ gave. Confirm the slug with PJ only if it's ambiguous. Target collection is `blog` unless PJ says it's a TIL (in conversation or via an `ai: til` directive), then use `til`: files go in `src/content/til/`, the draft uses the TIL register from the prompt, and the frontmatter omits `description` (the TIL schema doesn't have one).
 
 2. **Load the current prompt.** Read the highest-versioned `src/prompts/write-like-pj-v*.md`. That file IS the drafting instruction; follow it exactly. Note its version (e.g. `v1`).
 
-3. **Save the notes verbatim.** Copy the notes, completely unmodified, to `src/content/blog/_<slug>.notes.md`. No cleanup, no formatting fixes. Typos and fragments are the point; readers see this file as "raw notes".
+3. **Save the notes verbatim.** Copy the notes, completely unmodified, to `src/content/<collection>/_<slug>.notes.md`. No cleanup, no formatting fixes. Typos and fragments are the point; readers see this file as "raw notes".
 
-4. **Write the AI draft.** Generate the draft following the prompt, then write it to `src/content/blog/_<slug>.ai.md`. This file is a permanent verbatim record of what the AI produced:
+4. **Write the AI draft.** Generate the draft following the prompt, then write it to `src/content/<collection>/_<slug>.ai.md`. This file is a permanent verbatim record of what the AI produced:
    - Never edit it after this step, and never regenerate it once PJ has started editing the final post.
    - No frontmatter, markdown body only.
 
-5. **Scaffold the final post.** Create `src/content/blog/<slug>.md` with:
-   - Frontmatter: `title`, `date` (today, with timezone offset like existing posts), `description`, `tags`, `draft: true`, `assist: edited`, `promptVersion: <version from step 2>`.
+5. **Scaffold the final post.** Create `src/content/<collection>/<slug>.md` with:
+   - Frontmatter: `title`, `date` (today, with timezone offset like existing posts), `description` (blog only), `tags`, `draft: true`, `assist: edited`, `promptVersion: <version from step 2>`.
    - Body: an exact copy of the AI draft. This is PJ's editing start point; the diff between this file and `_<slug>.ai.md` becomes the record of his edits.
 
 6. **Hand off.** Tell PJ the three file paths and that the post is `draft: true`. He edits `<slug>.md` in his editor. Do not edit the final post for him unless he asks.
