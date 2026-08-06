@@ -1,0 +1,123 @@
+---
+// Three-view switcher for posts with AI provenance: Final (the published
+// post), My notes (PJ's raw notes), and AI draft (the model's output,
+// verbatim). Panels are all in the static HTML; a small script toggles
+// visibility. Non-final panels carry data-nosnippet and hidden so search
+// engines and screen readers only see the final text by default.
+interface Props {
+  hasNotes: boolean;
+  hasAi: boolean;
+  promptVersion?: string;
+}
+
+const { hasNotes, hasAi, promptVersion } = Astro.props;
+const showTabs = hasNotes || hasAi;
+
+const tabs = [
+  { id: 'final', label: 'Final', show: true },
+  { id: 'notes', label: 'My notes', show: hasNotes },
+  { id: 'ai', label: 'AI draft', show: hasAi },
+].filter(t => t.show);
+---
+
+{showTabs && (
+  <noscript>
+    <style is:inline>
+      .variant-tabs { display: none; }
+    </style>
+  </noscript>
+)}
+
+{showTabs && (
+  <div class="variant-tabs" role="tablist" aria-label="Post versions">
+    {tabs.map((tab, i) => (
+      <button
+        role="tab"
+        id={`tab-${tab.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        aria-controls={`panel-${tab.id}`}
+        data-variant={tab.id}
+        class:list={['variant-tab', { active: i === 0 }]}
+      >{tab.label}</button>
+    ))}
+  </div>
+)}
+
+<div id="panel-final" role={showTabs ? 'tabpanel' : undefined} aria-labelledby={showTabs ? 'tab-final' : undefined}>
+  <slot name="final" />
+</div>
+
+{hasNotes && (
+  <div id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" hidden data-nosnippet>
+    <p class="variant-note">Raw notes this post started from, unedited.</p>
+    <slot name="notes" />
+  </div>
+)}
+
+{hasAi && (
+  <div id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" hidden data-nosnippet>
+    <p class="variant-note">
+      What the AI produced from my notes, verbatim.
+      {promptVersion
+        ? <span> Generated with <a href="/how-i-write">prompt {promptVersion}</a>.</span>
+        : <span> See <a href="/how-i-write">how I write</a>.</span>}
+    </p>
+    <slot name="ai" />
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.variant-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.variant;
+      document.querySelectorAll<HTMLButtonElement>('.variant-tab').forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', String(active));
+      });
+      ['final', 'notes', 'ai'].forEach(id => {
+        const panel = document.getElementById(`panel-${id}`);
+        if (panel) panel.hidden = id !== target;
+      });
+    });
+  });
+</script>
+
+<style>
+  .variant-tabs {
+    display: inline-flex;
+    gap: 0;
+    margin: 0 auto var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .variant-tab {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.35rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+
+  .variant-tab + .variant-tab {
+    border-left: 1px solid var(--color-border);
+  }
+
+  .variant-tab.active {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  .variant-note {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--color-muted);
+    border-left: 3px solid var(--color-accent);
+    padding-left: 0.75rem;
+    margin-bottom: var(--space-md);
+  }
+</style>

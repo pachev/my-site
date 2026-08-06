@@ -17,6 +17,11 @@ const formatDate = (date) => {
     day: 'numeric'
   }).format(date);
 };
+
+const assistLabels: Record<string, string> = {
+  edited: 'AI-assisted',
+  heavy: 'Mostly AI-written',
+};
 ---
 
 <Layout title="Posts | Pachev Joseph" description="Posts by Pachev Joseph on software engineering, technology, and more.">
@@ -30,7 +35,12 @@ const formatDate = (date) => {
       <article class="post-card card">
         <div class="post-content">
           <h2><a href={`/posts/${post.slug}`}>{post.data.title}</a></h2>
-          <p class="post-date">{formatDate(post.data.date)}</p>
+          <p class="post-date">
+            {formatDate(post.data.date)}
+            {assistLabels[post.data.assist] && (
+              <span class="assist-chip">{assistLabels[post.data.assist]}</span>
+            )}
+          </p>
           {post.data.tags && post.data.tags.length > 0 && (
             <div class="post-tags">
               {post.data.tags.map(tag => (
@@ -89,6 +99,16 @@ const formatDate = (date) => {
     font-size: 0.9rem;
     color: var(--color-muted);
     margin-bottom: var(--space-xs);
+  }
+
+  .assist-chip {
+    font-size: 0.75rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+    padding: 0.1rem 0.5rem;
+    border-radius: 1rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
   }
 
   .post-excerpt {

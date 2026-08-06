@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PostVariants from '../../components/PostVariants.astro';
 import { formatDistance } from 'date-fns';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  
+
   return posts.map(post => ({
     params: { slug: post.slug },
     props: { post },
@@ -14,6 +15,24 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
+
+// Variant files live next to posts as _slug.notes.md / _slug.ai.md. The
+// leading underscore keeps them out of the blog collection, but they still
+// import as markdown modules here.
+const noteFiles = import.meta.glob<{ Content: any }>('../../content/blog/_*.notes.md');
+const aiFiles = import.meta.glob<{ Content: any }>('../../content/blog/_*.ai.md');
+
+const notesLoader = noteFiles[`../../content/blog/_${post.slug}.notes.md`];
+const aiLoader = aiFiles[`../../content/blog/_${post.slug}.ai.md`];
+
+const NotesContent = notesLoader ? (await notesLoader()).Content : null;
+const AiContent = aiLoader ? (await aiLoader()).Content : null;
+
+const assistLabels: Record<string, string> = {
+  edited: 'AI-assisted, edited by me',
+  heavy: 'Mostly AI-written',
+};
+const assistLabel = assistLabels[post.data.assist];
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
@@ -32,7 +51,14 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
         <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
         <span class="time-ago">({timeAgo})</span>
       </div>
-      
+
+      {assistLabel && (
+        <div class="assist-badge">
+          <a href="/how-i-write">{assistLabel}</a>
+        </div>
+      )}
+
+
       {post.data.tags && post.data.tags.length > 0 && (
         <div class="post-tags">
           {post.data.tags.map(tag => (
@@ -42,10 +68,28 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
       )}
     </div>
 
-    <div class="post-content">
-      <Content />
+    <div class="variant-switcher">
+      <PostVariants
+        hasNotes={!!NotesContent}
+        hasAi={!!AiContent}
+        promptVersion={post.data.promptVersion}
+      >
+        <div class="post-content" slot="final">
+          <Content />
+        </div>
+        {NotesContent && (
+          <div class="post-content" slot="notes">
+            <NotesContent />
+          </div>
+        )}
+        {AiContent && (
+          <div class="post-content" slot="ai">
+            <AiContent />
+          </div>
+        )}
+      </PostVariants>
     </div>
-    
+
     <div class="post-footer">
       <div class="post-nav">
         <a href="/posts" class="btn">← Back to Posts</a>
@@ -78,6 +122,32 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
 
   .time-ago {
     font-style: italic;
+  }
+
+  .assist-badge {
+    margin-bottom: var(--space-sm);
+  }
+
+  .assist-badge a {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.15rem 0.6rem;
+    border-radius: 1rem;
+    text-decoration: none;
+  }
+
+  .assist-badge a:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .variant-switcher {
+    text-align: center;
+  }
+
+  .variant-switcher .post-content {
+    text-align: left;
   }
 
   .post-tags {

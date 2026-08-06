@@ -4,6 +4,7 @@ date: 2025-05-20T14:30:00-05:00
 description: "Using Mise to replace some tools"
 tags: ["development", "tools", "nix", "mise"]
 draft: false
+assist: edited
 ---
 
 ## TL;DR
