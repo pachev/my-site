@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import promptV1 from '../prompts/write-like-pj-v1.md?raw';
+
+// The changelog grows as the prompt evolves; newest first. Each version's
+// prompt file lives in src/prompts/ so old posts can link the exact version
+// that generated their AI draft.
+const versions = [
+  {
+    version: 'v1',
+    date: 'August 2026',
+    notes: 'First version. Banned AI vocabulary and structures, plus voice rules distilled from nine years of my blog posts and older email.',
+  },
+];
+---
+
+<Layout
+  title="How I Write | Pachev Joseph"
+  description="How AI fits into my writing, and the evolving prompt I use to draft in my own voice."
+>
+  <article class="how-i-write">
+    <h1>How I write</h1>
+
+    <p>
+      Some posts here start as my raw notes, get drafted by an AI, and then get
+      edited by me until they say what I actually mean. I think readers deserve
+      to see that pipeline instead of guessing about it, so posts that had AI
+      help carry a badge and a three-way toggle: the <strong>final</strong>
+      version you'd normally read, <strong>my notes</strong> it started from,
+      and the <strong>AI draft</strong> in between, verbatim. Posts without the
+      toggle were written entirely by hand.
+    </p>
+
+    <p>
+      The drafts come from a prompt that tries to keep the machine out of my
+      voice. It bans the usual AI tells and describes how I actually write. It
+      evolves as I catch new slop patterns, and every version is kept so each
+      post can point at the exact prompt that produced its draft.
+    </p>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-version">v1 · current</span>
+      </div>
+      <pre><code>{promptV1}</code></pre>
+    </div>
+
+    <h2>Changelog</h2>
+
+    <ul class="changelog">
+      {versions.map(v => (
+        <li>
+          <strong>{v.version}</strong> <span class="changelog-date">({v.date})</span>: {v.notes}
+        </li>
+      ))}
+    </ul>
+  </article>
+</Layout>
+
+<style>
+  .how-i-write {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .how-i-write h1 {
+    margin-bottom: var(--space-md);
+  }
+
+  .how-i-write h2 {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+  }
+
+  .prompt-box {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .prompt-header {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .prompt-version {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .prompt-box pre {
+    margin: 0;
+    padding: 1rem 1.5rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .changelog {
+    list-style: none;
+    padding: 0;
+  }
+
+  .changelog li {
+    margin-bottom: var(--space-xs);
+  }
+
+  .changelog-date {
+    color: var(--color-muted);
+  }
+</style>
