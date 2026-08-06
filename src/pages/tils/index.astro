@@ -46,6 +46,9 @@ const allTags = [...new Set(tils.flatMap(til => til.data.tags))].sort();
             <h2 class="til-title"><a href={`/tils/${til.slug}`}>{til.data.title}</a></h2>
             <div class="til-meta">
               <time datetime={til.data.date.toISOString()}>{formatDate(til.data.date)}</time>
+              {til.data.assist !== 'none' && (
+                <span class="assist-chip">{til.data.assist === 'heavy' ? 'Mostly AI-written' : 'AI-assisted'}</span>
+              )}
               {til.data.tags && til.data.tags.length > 0 && (
                 <div class="til-tags">
                   {til.data.tags.map(tag => (
@@ -212,6 +215,15 @@ const allTags = [...new Set(tils.flatMap(til => til.data.tags))].sort();
   .til-meta time {
     font-size: 0.9rem;
     color: var(--color-muted);
+  }
+
+  .assist-chip {
+    font-size: 0.75rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+    padding: 0.1rem 0.5rem;
+    border-radius: 1rem;
+    white-space: nowrap;
   }
 
   .til-tags {

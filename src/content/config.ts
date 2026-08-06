@@ -19,13 +19,17 @@ const blogCollection = defineCollection({
 });
 
 // Define a schema for TIL (Today I Learned) posts
+// assist/promptVersion work the same as on blog posts; TILs with AI help can
+// ship _slug.notes.md / _slug.ai.md siblings for the three-view toggle.
 const tilCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false)
+    draft: z.boolean().default(false),
+    assist: z.enum(['none', 'edited', 'heavy']).default('none'),
+    promptVersion: z.string().optional()
   }),
 });
 

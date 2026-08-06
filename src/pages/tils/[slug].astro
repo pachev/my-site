@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PostVariants from '../../components/PostVariants.astro';
 import { formatDistance } from 'date-fns';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   const tils = await getCollection('til');
-  
+
   return tils.map(til => ({
     params: { slug: til.slug },
     props: { til },
@@ -14,6 +15,23 @@ export async function getStaticPaths() {
 
 const { til } = Astro.props;
 const { Content } = await til.render();
+
+// Same variant convention as blog posts: _slug.notes.md / _slug.ai.md
+// siblings, excluded from the collection by the leading underscore.
+const noteFiles = import.meta.glob<{ Content: any }>('../../content/til/_*.notes.md');
+const aiFiles = import.meta.glob<{ Content: any }>('../../content/til/_*.ai.md');
+
+const notesLoader = noteFiles[`../../content/til/_${til.slug}.notes.md`];
+const aiLoader = aiFiles[`../../content/til/_${til.slug}.ai.md`];
+
+const NotesContent = notesLoader ? (await notesLoader()).Content : null;
+const AiContent = aiLoader ? (await aiLoader()).Content : null;
+
+const assistLabels: Record<string, string> = {
+  edited: 'AI-assisted, edited by me',
+  heavy: 'Mostly AI-written',
+};
+const assistLabel = assistLabels[til.data.assist];
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
@@ -32,7 +50,14 @@ const timeAgo = formatDistance(til.data.date, new Date(), { addSuffix: true });
         <time datetime={til.data.date.toISOString()}>{formattedDate}</time>
         <span class="time-ago">({timeAgo})</span>
       </div>
-      
+
+      {assistLabel && (
+        <div class="assist-badge">
+          <a href="/how-i-write">{assistLabel}</a>
+        </div>
+      )}
+
+
       {til.data.tags && til.data.tags.length > 0 && (
         <div class="til-tags">
           {til.data.tags.map(tag => (
@@ -42,10 +67,28 @@ const timeAgo = formatDistance(til.data.date, new Date(), { addSuffix: true });
       )}
     </div>
 
-    <div class="til-content">
-      <Content />
+    <div class="variant-switcher">
+      <PostVariants
+        hasNotes={!!NotesContent}
+        hasAi={!!AiContent}
+        promptVersion={til.data.promptVersion}
+      >
+        <div class="til-content" slot="final">
+          <Content />
+        </div>
+        {NotesContent && (
+          <div class="til-content" slot="notes">
+            <NotesContent />
+          </div>
+        )}
+        {AiContent && (
+          <div class="til-content" slot="ai">
+            <AiContent />
+          </div>
+        )}
+      </PostVariants>
     </div>
-    
+
     <div class="til-footer">
       <div class="til-nav">
         <a href="/tils" class="btn">← Back to TIL</a>
@@ -78,6 +121,32 @@ const timeAgo = formatDistance(til.data.date, new Date(), { addSuffix: true });
 
   .time-ago {
     font-style: italic;
+  }
+
+  .assist-badge {
+    margin-bottom: var(--space-sm);
+  }
+
+  .assist-badge a {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.15rem 0.6rem;
+    border-radius: 1rem;
+    text-decoration: none;
+  }
+
+  .assist-badge a:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .variant-switcher {
+    text-align: center;
+  }
+
+  .variant-switcher .til-content {
+    text-align: left;
   }
 
   .til-tags {
