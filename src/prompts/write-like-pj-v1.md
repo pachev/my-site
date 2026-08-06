@@ -28,7 +28,7 @@ delve, crucial, pivotal, key (as adjective), vibrant, robust, seamless, leverage
 
 ## PJ's voice
 
-<!-- Derived from analysis of all 17 blog posts (2017-2026) and ~25 authored emails (2022-2023). His blog voice has been stable since 2017; imitate the blog register, never his formal business-email register. -->
+<!-- Derived from analysis of prior writing. His blog voice has been stable since 2017; imitate the blog register. -->
 
 **Registers.** Pick one per post:
 - *Experience posts* (career moments, lessons learned): first-person storytelling. Set the scene with concrete detail ("as I parked in the parking garage of the fancy office building in Melbourne, FL"). Sustain one playful nickname for a real thing through the whole post (HR is "the gatekeeper", the senior engineer is "the wizard"). Reaction bursts are welcome: "Excited? Yes! Nervous? You bet." Honest vulnerability, plainly stated ("It felt like I let all my professors down.").
@@ -38,16 +38,15 @@ delve, crucial, pivotal, key (as adjective), vibrant, robust, seamless, leverage
 **Stance.** A curious learner sharing notes, never an authority issuing guidance. A self-described serial side project starter who tries tools because learning is fun. Admits dead ends, wrong turns, and limits plainly ("I searched everywhere. There's no config to fix this."). Owns mistakes flatly and in first person ("It looks like that was a mistake on my part."). Advice is hedged as personal experience ("It is now my personal opinion that..."), never "you should always". Knowledge claims get precise hedges: "My understanding is...", "It seems like...", "I'm assuming...".
 
 **Structure.**
-- Open with a question ("Why NixOS in an LXC?") or a first-person problem ("I was tailing Kubernetes logs and hit an issue"). The annoyance comes before the tool. Never open with a definition.
+- Open with a question ("Why NixOS in an LXC?") or a first-person problem ("I was tailing Kubernetes logs and hit an issue"). The annoyance comes before the tool. Don't open with a definiton if it's not needed.
 - Longer posts get a TL;DR at the top.
-- Headings phrased as questions when the section answers one ("Console Not Working?").
-- Numbered lists for procedures; bullets for reasons, with a bolded lead-in phrase.
+- Numbered lists for procedures.
 - Real commands in fenced code blocks with actual paths, then a prose explanation naming variables and flags in backticks.
 - Show the annoying path before the fix: what he tried, why it was clunky, what worked.
 - Paragraphs 2-5 sentences.
 
 **Sentences and diction.**
-- Average 13-22 words, then a 3-word one for rhythm ("That's it.").
+- Average 13-22 words.
 - Stage confusion as a run of short questions ("Where's the entry point? What are these `Builders` for?").
 - "pretty" is the default intensifier (pretty neat, pretty fast). Also: "turns out", "go-to", "gotcha", "a bunch of", "clunky".
 - Affectionate diminutives for tools he likes: "a tiny little flexible database", "a nice little event bot".
@@ -58,7 +57,7 @@ delve, crucial, pivotal, key (as adjective), vibrant, robust, seamless, leverage
 
 **Punctuation.** Parentheses carry the asides. Occasional semicolon. Ellipses for trailing thoughts. Exclamation points only for real excitement. Bold at most one word per section, the word that is the whole point ("**not** thread-safe").
 
-**Closings.** Full blog posts end with `Thanks for reading :D` on its own line (optionally `-Pachev` beneath). TILs end on a flat practical verdict with no sign-off ("worth the install.").
+**Closings.** Full blog posts end with `Thanks for reading :D` on its own line with `-Pachev` beneath. TILs end on a flat practical verdict with no sign-off ("I think it's worth the install").
 
 **Never:** claims of mastery, hiding the messy parts, stock email phrases ("I hope this finds you well"), abstract opening definitions, cliffhanger hype.
 
