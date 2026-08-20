@@ -1,70 +1,360 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const allTils = await getCollection('til', ({ data }) => !data.draft);
+
+const recent = [
+  ...allPosts.map(post => ({ slug: post.slug, title: post.data.title, date: post.data.date, type: 'POST' as const, base: '/posts' })),
+  ...allTils.map(til => ({ slug: til.slug, title: til.data.title, date: til.data.date, type: 'TIL' as const, base: '/tils' })),
+]
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, 3);
+
+const formatDate = (date: Date) => date.toISOString().slice(0, 10);
 ---
 
-<Layout>
+<Layout wide>
   <section class="hero">
-    <div class="hero-content">
-      <h1>Pachev Joseph</h1>
-      <p class="subtitle">Code | Experiment | Share</p>
+    <div class="hero-row">
+      <div class="hero-left">
+        <div class="eyebrow">
+          <span class="rule"></span>
+          <span>PACHEVJOSEPH.COM // ONLINE SINCE 2017</span>
+        </div>
+        <h1 class="hero-name">Pachev<br />Joseph</h1>
+        <div class="tagline">CODE / EXPERIMENT / SHARE</div>
+        <div class="hero-buttons">
+          <a href="/posts" class="btn-ink">READ THE POSTS</a>
+          <a href="/tils" class="btn-line">BROWSE TILS</a>
+        </div>
+      </div>
+
+      <div class="terminal-card">
+        <div class="terminal-titlebar">
+          <span class="dot dot-sage"></span>
+          <span class="dot dot-outline"></span>
+          <span class="dot dot-outline"></span>
+          <span class="terminal-label">~/pachev</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="prompt">$</span> whoami</div>
+          <div class="bright">software engineer. homelab tinkerer.</div>
+          <div><span class="prompt">$</span> ls ~/writing</div>
+          <div class="bright">posts/&nbsp;&nbsp;tils/&nbsp;&nbsp;lab/&nbsp;&nbsp;essays/</div>
+          <div><span class="prompt">$</span> <span class="caret"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="recent">
+    <div class="recent-header">
+      <span class="recent-label">RECENT WRITING</span>
+      <a href="/posts" class="recent-link">VIEW FULL INDEX +</a>
+    </div>
+    <div class="recent-grid">
+      {recent.map(item => (
+        <a href={`${item.base}/${item.slug}`} class="recent-card">
+          <div class="recent-meta">
+            <span>{formatDate(item.date)}</span>
+            <span class:list={['chip', { 'chip-post': item.type === 'POST', 'chip-til': item.type === 'TIL' }]}>{item.type}</span>
+          </div>
+          <div class="recent-title">{item.title}</div>
+          <div class="recent-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+          </div>
+        </a>
+      ))}
     </div>
   </section>
 </Layout>
 
 <style>
   .hero {
+    flex-grow: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    padding: 56px 0 48px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-row {
+    display: flex;
     align-items: center;
-    min-height: calc(100vh - 200px);
-    text-align: center;
+    gap: clamp(64px, 6vw, 140px);
   }
 
-  .hero-content {
-    max-width: 800px;
-  }
-
-  h1 {
-    font-size: 4.5rem;
-    margin-bottom: var(--space-xs);
-    line-height: 1.1;
-    font-weight: 900;
-  }
-
-  .subtitle {
-    font-size: 1.5rem;
-    color: var(--color-muted);
-    margin-bottom: var(--space-lg);
-  }
-
-  .cta-buttons {
+  .hero-left {
     display: flex;
-    justify-content: center;
-    gap: var(--space-md);
+    flex-direction: column;
+    gap: 26px;
+    flex-grow: 1;
   }
 
-  .btn-secondary {
-    background-color: transparent;
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-mono);
+    font-size: clamp(11px, 0.62vw, 13px);
+    letter-spacing: 0.22em;
+    color: var(--color-sage);
+  }
+
+  .eyebrow .rule {
+    width: 28px;
+    height: 1px;
+    background: var(--color-sage);
+    display: inline-block;
+  }
+
+  .hero-name {
+    font-size: clamp(72px, 6.8vw, 150px);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin-bottom: 0;
+  }
+
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: clamp(14px, 0.85vw, 17px);
+    letter-spacing: 0.18em;
     color: var(--color-accent);
-    border: 2px solid var(--color-accent);
   }
 
-  .btn-secondary:hover {
-    background-color: rgba(130, 146, 128, 0.1);
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+  }
+
+  .btn-ink,
+  .btn-line {
+    font-family: var(--font-mono);
+    font-size: clamp(12px, 0.68vw, 14px);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    padding: clamp(15px, 1vw, 18px) clamp(28px, 1.8vw, 34px);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .btn-ink {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .btn-ink:hover {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .btn-line {
+    border: 1px solid #b9b6a6;
+    color: #5b5b51;
+  }
+
+  .btn-line:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-ink,
+    .btn-line {
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .btn-ink:active,
+    .btn-line:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .terminal-card {
+    width: clamp(440px, 30vw, 600px);
+    flex-shrink: 0;
+    background: var(--color-terminal-bg);
+    color: var(--color-terminal-text);
+    box-shadow: 12px 12px 0 #82928033;
+    font-family: var(--font-mono);
+    font-size: clamp(13px, 0.8vw, 15px);
+    line-height: 1.85;
+  }
+
+  .terminal-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--color-terminal-border);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+
+  .dot-sage {
+    background: var(--color-sage);
+  }
+
+  .dot-outline {
+    border: 1px solid #4a4d45;
+  }
+
+  .terminal-label {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--color-terminal-label);
+  }
+
+  .terminal-body {
+    padding: 20px 22px;
+  }
+
+  .prompt {
+    color: var(--color-terminal-accent);
+  }
+
+  .bright {
+    color: var(--color-terminal-bright);
+  }
+
+  .caret {
+    display: inline-block;
+    width: 9px;
+    height: 16px;
+    background: var(--color-terminal-accent);
+    vertical-align: text-bottom;
+  }
+
+  .recent {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 36px 0;
+  }
+
+  .recent-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .recent-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: var(--color-text);
+  }
+
+  .recent-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--color-accent);
+  }
+
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .recent-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    padding: clamp(24px, 1.6vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--color-text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .recent-card:hover {
+    border-color: var(--color-sage);
+    transform: translateY(-3px);
+  }
+
+  .recent-card:hover .recent-arrow {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .recent-card:active {
+      transform: translateY(-1px);
+    }
+  }
+
+  .recent-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--color-muted);
+  }
+
+  .chip {
+    padding: 2px 8px;
+    border: 1px solid var(--color-border);
+  }
+
+  .chip-post {
+    color: var(--color-accent);
+    border-color: var(--color-chip-border);
+  }
+
+  .chip-til {
+    color: var(--color-muted);
+    border-color: var(--color-border);
+  }
+
+  .recent-title {
+    font-size: clamp(20px, 1.15vw, 23px);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+
+  .recent-arrow {
+    margin-top: auto;
+    opacity: 0;
+    color: var(--color-accent);
+    transition: opacity 0.15s ease;
   }
 
   @media (max-width: 768px) {
-    h1 {
-      font-size: 3rem;
+    .hero {
+      padding: 34px 0 26px;
     }
 
-    .subtitle {
-      font-size: 1.2rem;
-    }
-
-    .cta-buttons {
+    .hero-row {
       flex-direction: column;
-      gap: var(--space-sm);
+      align-items: stretch;
+      gap: 18px;
+    }
+
+    .hero-name {
+      font-size: 54px;
+      line-height: 0.98;
+    }
+
+    .terminal-card {
+      width: 100%;
+      box-shadow: 8px 8px 0 #82928033;
+    }
+
+    .recent-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

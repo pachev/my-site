@@ -48,6 +48,7 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
     <div class="post-header">
       <h1>{post.data.title}</h1>
       <div class="post-meta">
+        <span class="meta-rule"></span>
         <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
         <span class="time-ago">({timeAgo})</span>
       </div>
@@ -110,14 +111,30 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
   }
 
   .post-header h1 {
+    font-family: var(--font-primary);
+    font-weight: 700;
     font-size: 2.8rem;
     margin-bottom: var(--space-xs);
   }
 
   .post-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
     color: var(--color-muted);
-    font-size: 1rem;
+    font-size: 0.75rem;
     margin-bottom: var(--space-sm);
+  }
+
+  .meta-rule {
+    width: 20px;
+    height: 1px;
+    background: var(--color-sage);
+    display: inline-block;
   }
 
   .time-ago {
@@ -182,13 +199,13 @@ const timeAgo = formatDistance(post.data.date, new Date(), { addSuffix: true });
   .post-content :global(pre code) {
     background-color: transparent;
     padding: 0;
-    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.9rem;
     line-height: 1.5;
   }
 
   .post-content :global(code) {
-    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+    font-family: var(--font-mono);
     background-color: rgba(0, 0, 0, 0.07);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
