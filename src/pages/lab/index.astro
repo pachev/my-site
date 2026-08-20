@@ -2,6 +2,7 @@
 // Standalone page: /lab is the one route that becomes a full-viewport dark
 // desktop, so it does NOT use the site Layout (no header/footer).
 import { getCollection } from 'astro:content';
+import { execFileSync } from 'node:child_process';
 import '../../styles/global.css';
 import '../../styles/lab.css';
 import LabWaybar from '../../components/lab/LabWaybar.astro';
@@ -10,9 +11,33 @@ import LabNetwork from '../../components/lab/LabNetwork.astro';
 import LabCompute from '../../components/lab/LabCompute.astro';
 import LabStorage from '../../components/lab/LabStorage.astro';
 import LabLog from '../../components/lab/LabLog.astro';
+import LabShell from '../../components/lab/LabShell.astro';
 
 const allPosts = await getCollection('lab', ({ data }) => !data.draft);
 const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const astroVersion = Astro.generator.replace(/^Astro\s+v?/i, '');
+const buildDate = new Date().toISOString().slice(0, 10);
+
+function resolveGitCommit() {
+  const suppliedCommit = [
+    process.env.SOURCE_COMMIT,
+    process.env.COOLIFY_GIT_COMMIT_SHA,
+    process.env.GITHUB_SHA,
+    process.env.COMMIT_SHA,
+  ].find(Boolean);
+  if (suppliedCommit) return suppliedCommit.slice(0, 7);
+
+  try {
+    return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return 'unknown';
+  }
+}
+
+const gitCommit = resolveGitCommit();
 ---
 
 <!doctype html>
@@ -85,7 +110,7 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
       </div>
     </noscript>
 
-    <div class="lab-desktop" id="lab-desktop">
+    <div class="lab-desktop" id="lab-desktop" data-lab-theme="sage">
       <LabBoot />
       <LabWaybar />
       <div class="lab-scenes">
@@ -94,10 +119,12 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
         <LabStorage />
         <LabLog />
       </div>
+      <LabShell astroVersion={astroVersion} buildDate={buildDate} gitCommit={gitCommit} />
     </div>
 
     <script>
       import { initLabWindowManager } from '../../scripts/labWindowManager';
+      import { initLabShell } from '../../scripts/labShell';
 
       const bootEl = document.getElementById('lab-boot') as HTMLElement | null;
       const bootBarFill = document.getElementById('lab-boot-bar-fill') as HTMLElement | null;
@@ -164,6 +191,7 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
       });
 
       initLabWindowManager(prefersReducedMotion);
+      initLabShell(prefersReducedMotion);
 
       // ---------- Live clock ----------
 
