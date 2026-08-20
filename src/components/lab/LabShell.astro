@@ -1,0 +1,65 @@
+---
+type Props = {
+  astroVersion: string;
+  buildDate: string;
+  gitCommit: string;
+};
+
+const { astroVersion, buildDate, gitCommit } = Astro.props;
+---
+
+<section
+  class="lab-shell"
+  id="lab-shell"
+  data-astro-version={astroVersion}
+  data-build-date={buildDate}
+  data-git-commit={gitCommit}
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="lab-shell-title"
+  hidden
+>
+  <button type="button" class="lab-shell-backdrop" data-shell-close aria-label="Close command palette"></button>
+  <div class="lab-window lab-shell-window">
+    <div class="lab-titlebar">
+      <span class="lab-tb-title" id="lab-shell-title">pj@lab: ~</span>
+      <button type="button" class="lab-tb-x" data-shell-close aria-label="Close command palette">✕</button>
+    </div>
+    <div class="lab-shell-body">
+      <div class="lab-shell-output" data-shell-output aria-live="polite" aria-atomic="false">
+        <div class="lab-shell-line lab-shell-muted">PJ LAB SHELL 0.3.0 · type <span class="lab-shell-command">help</span></div>
+      </div>
+      <form class="lab-shell-form" data-shell-form>
+        <label class="lab-shell-prompt" for="lab-shell-input">pj@lab&nbsp;~&nbsp;$</label>
+        <input
+          class="lab-shell-input"
+          id="lab-shell-input"
+          data-shell-input
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          aria-label="Lab command"
+        />
+        <span class="lab-shell-caret" aria-hidden="true">▮</span>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="lab-rebuild" id="lab-rebuild" role="status" aria-live="assertive" hidden>
+  <div class="lab-rebuild-grid" aria-hidden="true"></div>
+  <div class="lab-rebuild-inner">
+    <div class="lab-rebuild-kicker">NIXOS REBUILD // LAB PROFILE</div>
+    <div class="lab-rebuild-theme" data-rebuild-theme>SAGE</div>
+    <div class="lab-rebuild-progress"><div data-rebuild-progress></div></div>
+    <div class="lab-rebuild-log" data-rebuild-log></div>
+  </div>
+</div>
+
+<div class="lab-konami" id="lab-konami" role="status" aria-live="assertive" hidden>
+  <div class="lab-konami-code">EMERGENCY</div>
+  <div class="lab-konami-title">PATTERN BLUE</div>
+  <div class="lab-konami-sub">ANGEL DETECTED // NERV OVERRIDE ACCEPTED</div>
+</div>
