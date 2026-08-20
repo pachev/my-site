@@ -152,9 +152,7 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
         requestAnimationFrame(tick);
       }
 
-      if (!alreadyBooted && !prefersReducedMotion) {
-        showBoot();
-      } else if (!alreadyBooted && prefersReducedMotion) {
+      if (!alreadyBooted) {
         showBoot();
       }
       // If alreadyBooted, overlay stays hidden (default markup state).

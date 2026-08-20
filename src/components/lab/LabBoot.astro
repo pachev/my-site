@@ -28,6 +28,12 @@
     justify-content: center;
   }
 
+  /* The hidden attribute only carries UA-level display:none, which any
+     author display rule overrides; this keeps hidden actually hiding. */
+  .lab-boot[hidden] {
+    display: none;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .lab-boot {
       transition: opacity 200ms ease;
