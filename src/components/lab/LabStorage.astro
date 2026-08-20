@@ -1,0 +1,267 @@
+---
+// Workspace 3: drive bays, ZFS pool reactor core, telemetry/exports/scrub.
+const bays = [
+  { id: 'BAY 0', model: 'WD RED PLUS 4T' },
+  { id: 'BAY 1', model: 'WD RED PLUS 4T' },
+  { id: 'BAY 2', model: 'WD RED 4T' },
+  { id: 'BAY 3', model: 'WD RED 4T' },
+];
+
+const exports = [
+  { name: 'proxmox', note: 'cluster shared storage' },
+  { name: 'media', note: 'plex library' },
+  { name: 'pgdata', note: 'atuin · katzenbase' },
+  { name: 'photos', note: 'immich' },
+];
+---
+
+<section class="lab-scene lab-storage" data-scene="3" role="tabpanel" aria-label="Storage">
+  <div class="lab-storage-scene">
+    <div class="lab-bays">
+      <div class="lab-bay-head">DRIVE BAYS · FRACTAL NODE 304</div>
+      {bays.map((bay) => (
+        <div class="lab-bay">
+          <span class="lab-bay-id">{bay.id}</span>
+          <span class="lab-bay-model">{bay.model}</span>
+          <span class="lab-bay-stat"><span class="lab-dot"></span> ONLINE</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="lab-core">
+      <div class="lab-ring lab-ring-1"><div class="lab-ring lab-ring-2"><div class="lab-ring lab-ring-3">
+        <div class="lab-core-inner">
+          <div class="lab-core-label">ZFS POOL</div>
+          <div class="lab-core-name">joseph-nas-1</div>
+          <div class="lab-core-pct">58%</div>
+          <div class="lab-core-sub">2.3T / 4.0T</div>
+        </div>
+      </div></div></div>
+      <div class="lab-core-caption">THE CORE. IF THIS BLINKS RED, EVERYTHING ELSE IS DECORATION.</div>
+    </div>
+
+    <div class="lab-stats">
+      <div class="lab-stat-head">POOL TELEMETRY</div>
+      <div class="lab-stat"><span class="lab-sk">ARC HIT</span><div class="lab-gauge"><div class="lab-gfill" style="width:98%"></div></div><span class="lab-sv">98.2%</span></div>
+      <div class="lab-stat"><span class="lab-sk">CAPACITY</span><div class="lab-gauge"><div class="lab-gfill" style="width:58%"></div></div><span class="lab-sv">58%</span></div>
+      <div class="lab-stat"><span class="lab-sk">FRAG</span><div class="lab-gauge"><div class="lab-gfill" style="width:11%"></div></div><span class="lab-sv">11%</span></div>
+
+      <div class="lab-stat-head lab-stat-head-second">NFS EXPORTS</div>
+      {exports.map((exp) => (
+        <div class="lab-exp"><span class="lab-dot"></span> {exp.name} <span class="lab-exp-note">{exp.note}</span></div>
+      ))}
+
+      <div class="lab-stat-head lab-stat-head-second">LAST SCRUB</div>
+      <div class="lab-scrub">0 ERRORS · 0B REPAIRED<br /><span class="lab-scrub-note">as it should be.</span></div>
+    </div>
+  </div>
+
+  <div class="lab-hintbar">MOUNTED BY DNS NAME, NOT IP. LEARNED THAT ONE THE LONG WAY &mdash; SEE 4:LOG.</div>
+</section>
+
+<style>
+  .lab-storage-scene {
+    display: grid;
+    grid-template-columns: 360px 1fr 360px;
+    align-items: center;
+    padding: 0 48px 56px;
+    gap: 32px;
+    min-height: calc(100% - 40px);
+  }
+
+  .lab-bays {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lab-bay-head {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--lab-muted);
+    margin-bottom: 8px;
+  }
+
+  .lab-bay {
+    border: 1px solid var(--lab-border);
+    background: var(--lab-surface);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-bay {
+      transition: border-color 0.12s ease;
+    }
+  }
+
+  .lab-bay:hover {
+    border-color: var(--lab-sage);
+  }
+
+  .lab-bay-id {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--lab-muted);
+    width: 48px;
+  }
+
+  .lab-bay-model {
+    font-size: 12px;
+    color: var(--lab-bright);
+    letter-spacing: 0.06em;
+  }
+
+  .lab-bay-stat {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--lab-sage);
+  }
+
+  .lab-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .lab-ring {
+    border: 1px solid var(--lab-border);
+    padding: 22px;
+  }
+
+  .lab-ring-2 {
+    border-color: var(--lab-border-bright);
+  }
+
+  .lab-ring-3 {
+    border-color: var(--lab-sage);
+    box-shadow: 0 0 42px rgba(163, 179, 160, 0.18);
+  }
+
+  .lab-core-inner {
+    width: 220px;
+    height: 220px;
+    background: var(--lab-surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .lab-core-label {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    color: var(--lab-muted);
+  }
+
+  .lab-core-name {
+    font-size: 15px;
+    color: var(--lab-text);
+    letter-spacing: 0.08em;
+  }
+
+  .lab-core-pct {
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--lab-bright);
+    line-height: 1;
+    margin-top: 6px;
+  }
+
+  .lab-core-sub {
+    font-size: 11px;
+    color: var(--lab-accent);
+    letter-spacing: 0.14em;
+  }
+
+  .lab-core-caption {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--lab-dim);
+    text-align: center;
+    max-width: 340px;
+    line-height: 1.8;
+  }
+
+  .lab-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lab-stat-head {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--lab-muted);
+    margin-bottom: 2px;
+  }
+
+  .lab-stat-head-second {
+    margin-top: 16px;
+  }
+
+  .lab-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lab-sk {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--lab-muted);
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  .lab-sv {
+    font-size: 11px;
+    color: var(--lab-text);
+    width: 46px;
+    text-align: right;
+  }
+
+  .lab-exp {
+    font-size: 12px;
+    color: var(--lab-text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .lab-exp-note {
+    color: var(--lab-muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    margin-left: auto;
+  }
+
+  .lab-scrub {
+    font-size: 12px;
+    color: var(--lab-sage);
+    letter-spacing: 0.1em;
+    line-height: 1.9;
+  }
+
+  .lab-scrub-note {
+    color: var(--lab-muted);
+    font-size: 10px;
+  }
+
+  @media (max-width: 900px) {
+    .lab-storage-scene {
+      grid-template-columns: 1fr;
+      padding: 20px 16px 24px;
+      gap: 28px;
+    }
+
+    .lab-core {
+      order: -1;
+    }
+  }
+</style>

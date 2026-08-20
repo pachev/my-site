@@ -1,0 +1,30 @@
+---
+// 48px workspace bar: home link, workspace switcher, live status.
+const workspaces = [
+  { id: '1', label: '1:NETWORK' },
+  { id: '2', label: '2:COMPUTE' },
+  { id: '3', label: '3:STORAGE' },
+  { id: '4', label: '4:LOG' },
+];
+---
+
+<div class="lab-waybar">
+  <a href="/" class="lab-wb-left">PJ<span class="lab-us">_</span>&nbsp;&nbsp;LAB</a>
+  <div class="lab-wb-ws" role="tablist" aria-label="Lab workspaces">
+    {workspaces.map((ws, i) => (
+      <button
+        type="button"
+        class="lab-ws"
+        class:list={[{ active: i === 0 }]}
+        data-workspace={ws.id}
+        role="tab"
+        aria-selected={i === 0 ? 'true' : 'false'}
+      >
+        {ws.label}
+      </button>
+    ))}
+  </div>
+  <div class="lab-wb-right">
+    <span class="lab-dot"></span> 5 NODES&nbsp;&nbsp;&nbsp;ZFS 58%&nbsp;&nbsp;&nbsp;<span id="lab-clock">--:--</span>
+  </div>
+</div>

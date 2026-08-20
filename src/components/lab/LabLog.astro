@@ -1,0 +1,176 @@
+---
+// Workspace 4: journal terminal. Real articles (getCollection('lab')) render
+// as clickable rows; the seven static system events below are flavor only.
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('lab', ({ data }) => !data.draft);
+const articles = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    .format(date)
+    .toUpperCase()
+    .replace(',', '');
+
+const systemEvents = [
+  { date: 'AUG 11 2026', message: 'Replaced Debian LXCs with NixOS containers: frigate, immich, github-runner', warn: false },
+  { date: 'AUG 11 2026', message: 'Deployed telegraf on every node, pointed at VictoriaMetrics. The lab has vitals now', warn: false },
+  { date: 'AUG 10 2026', message: 'Destroyed palworld server. No survivors', warn: false },
+  { date: 'AUG 06 2026', message: 'Migrated all NFS mounts from raw IPs to DNS names, then rebooted the whole cluster', warn: false },
+  { date: 'AUG 06 2026', message: 'ser-24gb took five power cycles to come back. Nothing was wrong. Hardware is haunted', warn: true },
+  { date: 'JUL 2026', message: 'Replaced the stock ATT gateway with a full UniFi stack. The BGW210 lives on in bridge-mode purgatory', warn: false },
+  { date: 'MAR 2025', message: 'Racked everything into a 15U open frame. It has a patch panel now. This is a real lab', warn: false },
+];
+---
+
+<section class="lab-scene lab-log" data-scene="4" role="tabpanel" aria-label="Journal log">
+  <div class="lab-window lab-term">
+    <div class="lab-prompt">$ journalctl -u pj-lab --since 2025 -f</div>
+
+    {articles.length > 0 ? (
+      articles.map((post) => (
+        <a class="lab-entry lab-entry-article" href={`/lab/${post.slug}`}>
+          <span class="lab-edate">{formatDate(post.data.date)}</span>
+          <span class="lab-emsg">{post.data.title}</span>
+          <span class="lab-eread">READ &rarr;</span>
+        </a>
+      ))
+    ) : (
+      <div class="lab-entry lab-entry-empty">
+        <span class="lab-emsg">-- no articles yet. the lab is quiet. --</span>
+      </div>
+    )}
+
+    {systemEvents.map((event) => (
+      <div class:list={['lab-entry', 'lab-entry-system', { 'lab-entry-warn': event.warn }]}>
+        <span class="lab-edate">{event.date}</span>
+        <span class="lab-emsg">{event.message}</span>
+      </div>
+    ))}
+
+    <div class="lab-cursor-line">$ <span class="lab-caret">▮</span></div>
+  </div>
+
+  <div class="lab-hintbar">EACH ENTRY OPENS AS A REGULAR ARTICLE &mdash; LIGHT, READABLE, THE CALM SITE AGAIN.</div>
+</section>
+
+<style>
+  .lab-term {
+    margin: 40px auto 56px;
+    max-width: 1080px;
+    width: calc(100% - 96px);
+    padding: 36px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .lab-prompt {
+    font-size: 14px;
+    color: var(--lab-sage);
+    letter-spacing: 0.04em;
+    margin-bottom: 26px;
+  }
+
+  .lab-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    padding: 13px 14px;
+    margin: 0 -14px;
+    text-decoration: none;
+  }
+
+  .lab-entry-article {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-entry-article {
+      transition: background 0.1s ease;
+    }
+
+    .lab-entry-article .lab-eread {
+      transition: opacity 0.1s ease;
+    }
+  }
+
+  .lab-entry-article:hover {
+    background: var(--lab-raised);
+  }
+
+  .lab-entry-article:hover .lab-eread {
+    opacity: 1;
+  }
+
+  .lab-edate {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--lab-muted);
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .lab-emsg {
+    font-size: 14px;
+    color: var(--lab-text);
+    letter-spacing: 0.02em;
+  }
+
+  .lab-entry-article:hover .lab-emsg {
+    color: var(--lab-bright);
+  }
+
+  .lab-entry-system .lab-edate {
+    color: var(--lab-dim);
+  }
+
+  .lab-entry-system .lab-emsg {
+    color: var(--lab-muted);
+  }
+
+  .lab-entry-warn .lab-emsg {
+    color: var(--lab-warn);
+  }
+
+  .lab-entry-empty .lab-emsg {
+    color: var(--lab-muted);
+  }
+
+  .lab-eread {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--lab-sage);
+    opacity: 0;
+    flex-shrink: 0;
+  }
+
+  .lab-cursor-line {
+    margin-top: 26px;
+    font-size: 14px;
+    color: var(--lab-sage);
+  }
+
+  @media (max-width: 900px) {
+    .lab-term {
+      width: calc(100% - 32px);
+      padding: 24px 20px;
+      margin: 20px auto 24px;
+    }
+
+    .lab-entry {
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .lab-edate {
+      width: auto;
+    }
+
+    .lab-eread {
+      margin-left: 0;
+    }
+  }
+</style>

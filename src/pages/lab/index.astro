@@ -1,238 +1,217 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+// Standalone page: /lab is the one route that becomes a full-viewport dark
+// desktop, so it does NOT use the site Layout (no header/footer).
 import { getCollection } from 'astro:content';
+import '../../styles/global.css';
+import '../../styles/lab.css';
+import LabWaybar from '../../components/lab/LabWaybar.astro';
+import LabBoot from '../../components/lab/LabBoot.astro';
+import LabNetwork from '../../components/lab/LabNetwork.astro';
+import LabCompute from '../../components/lab/LabCompute.astro';
+import LabStorage from '../../components/lab/LabStorage.astro';
+import LabLog from '../../components/lab/LabLog.astro';
 
-// Get all lab posts that aren't drafts
-const allPosts = await getCollection('lab', ({ data }) => {
-  return !data.draft;
-});
-
-// Sort posts by date (newest first)
-const posts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-const formatDate = (date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date);
-};
+const allPosts = await getCollection('lab', ({ data }) => !data.draft);
+const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<Layout title="Home Lab Journal | Pachev Joseph" description="Home Lab Journal by Pachev Joseph on infrastructure, server setups, and technology experiments.">
-  <section class="lab-header">
-    <h1>Home Lab Journal</h1>
-    <p>Documentation, updates, and learnings from my home lab experiments</p>
-  </section>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="Home Lab Journal and fake desktop environment by Pachev Joseph." />
+    <title>Lab | Pachev Joseph</title>
+    <noscript>
+      <style>
+        .lab-desktop {
+          display: none;
+        }
 
-  <section class="current-setup">
-    <div class="card">
-      <h2>Current Setup</h2>
-      <div class="setup-details">
-        <div class="setup-grid">
-          <div class="setup-item">
-            <h3>Compute</h3>
-            <p>Four mini PCs (all Proxmox nodes):</p>
+        .lab-noscript {
+          display: block;
+          background: #f2f0e9;
+          color: #191b18;
+          min-height: 100vh;
+          font-family: var(--font-primary);
+          padding: var(--space-xl) var(--space-md);
+        }
+
+        .lab-noscript-inner {
+          max-width: 720px;
+          margin: 0 auto;
+        }
+
+        .lab-noscript h1 {
+          margin-bottom: var(--space-sm);
+        }
+
+        .lab-noscript ul {
+          list-style: none;
+          padding-left: 0;
+          margin-bottom: var(--space-lg);
+        }
+
+        .lab-noscript li {
+          padding: var(--space-sm) 0;
+          border-bottom: 1px solid #dcd9cc;
+        }
+
+        .lab-noscript a {
+          color: #55654f;
+          font-weight: 600;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <noscript>
+      <div class="lab-noscript">
+        <div class="lab-noscript-inner">
+          <h1>Home Lab Journal</h1>
+          {noscriptPosts.length > 0 ? (
             <ul>
-              <li><em>EQ14</em> (Intel N150): Security cameras with Frigate, Coral TPU</li>
-              <li><em>S13</em> (Intel N150): Dedicated Plex server with HW transcoding</li>
-              <li><em>Beelink SER5 Pro</em>: Hosts Coolify and Home Assistant</li>
-              <li><em>Beelink SER5 MAX</em> (AMD Ryzen 7 6800U): OpenClaw and other experiments</li>
+              {noscriptPosts.map((post) => (
+                <li><a href={`/lab/${post.slug}`}>{post.data.title}</a></li>
+              ))}
             </ul>
-          </div>
-          
-          <div class="setup-item">
-            <h3>Storage</h3>
-            <p>Custom built NAS:</p>
-            <ul>
-              <li>Fractal Node 304 case</li>
-              <li>4x HDDs in ZFS pool</li>
-              <li>4TB usable storage</li>
-              <li>Running Ubuntu Server</li>
-            </ul>
-          </div>
-          
-          <div class="setup-item">
-            <h3>Software</h3>
-            <ul>
-              <li>Proxmox VE on compute nodes</li>
-              <li>Ubuntu + ZFS on NAS</li>
-              <li>Key services: Home Assistant, Frigate, Plex, Coolify</li>
-              <li><code>-ARR</code> stack for media management</li>
-            </ul>
-          </div>
-          
-          <div class="setup-item">
-            <h3>Network</h3>
-            <ul>
-              <li>UniFi Cloud Gateway Fiber (ATT fiber upstream)</li>
-              <li>USW Lite 16 PoE + USW Flex switches</li>
-              <li>U6 Pro and 2x U7 In-Wall access points</li>
-              <li>15U wall-mount rack with PDU and patch panel</li>
-              <li>Cloudflare Tunnels for external access</li>
-            </ul>
-          </div>
+          ) : (
+            <p>No entries yet.</p>
+          )}
+          <p><a href="/">&larr; Back home</a></p>
         </div>
-        <p class="setup-footer">I'll keep this section updated as it changes.</p>
+      </div>
+    </noscript>
+
+    <div class="lab-desktop" id="lab-desktop">
+      <LabBoot />
+      <LabWaybar />
+      <div class="lab-scenes">
+        <LabNetwork />
+        <LabCompute />
+        <LabStorage />
+        <LabLog />
       </div>
     </div>
-  </section>
 
-  <section class="posts">
-    {posts.map(post => (
-      <article class="post-card card">
-        <div class="post-content">
-          <h2><a href={`/lab/${post.slug}`}>{post.data.title}</a></h2>
-          <p class="post-date">{formatDate(post.data.date)}</p>
-          {post.data.tags && post.data.tags.length > 0 && (
-            <div class="post-tags">
-              {post.data.tags.map(tag => (
-                <span class="tag">{tag}</span>
-              ))}
-            </div>
-          )}
-          <p class="post-excerpt">{post.data.description}</p>
-          <a href={`/lab/${post.slug}`} class="read-more">Read more →</a>
-        </div>
-      </article>
-    ))}
-  </section>
-</Layout>
+    <script>
+      const bootEl = document.getElementById('lab-boot') as HTMLElement | null;
+      const bootBarFill = document.getElementById('lab-boot-bar-fill') as HTMLElement | null;
+      const bootPct = document.getElementById('lab-boot-pct') as HTMLElement | null;
+      const bootEnter = document.getElementById('lab-boot-enter') as HTMLButtonElement | null;
 
-<style>
-  .lab-header {
-    text-align: center;
-    margin-bottom: var(--space-lg);
-  }
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const alreadyBooted = sessionStorage.getItem('lab-booted') === '1';
 
-  .lab-header h1 {
-    font-size: 3rem;
-    margin-bottom: var(--space-xs);
-  }
+      function hideBoot(instant: boolean) {
+        if (!bootEl) return;
+        sessionStorage.setItem('lab-booted', '1');
 
-  .lab-header p {
-    color: var(--color-muted);
-    font-size: 1.2rem;
-  }
+        if (instant || prefersReducedMotion) {
+          bootEl.hidden = true;
+          return;
+        }
 
-  .current-setup {
-    max-width: 800px;
-    margin: 0 auto var(--space-xl);
-  }
+        bootEl.classList.add('lab-boot-fade');
+        window.setTimeout(() => {
+          bootEl.hidden = true;
+        }, 200);
+      }
 
-  .setup-details {
-    color: var(--color-text);
-    line-height: 1.6;
-  }
+      function showBoot() {
+        if (!bootEl || !bootBarFill || !bootPct || !bootEnter) return;
+        bootEl.hidden = false;
 
-  .setup-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--space-md);
-    margin: var(--space-md) 0;
-  }
+        if (prefersReducedMotion) {
+          bootBarFill.classList.add('lab-boot-full');
+          bootPct.textContent = '100%';
+          bootEnter.hidden = false;
+          return;
+        }
 
-  .setup-item {
-    background-color: rgba(0, 0, 0, 0.03);
-    border-radius: 8px;
-    padding: var(--space-md);
-  }
+        // Animate the fill via CSS transition, then reveal ENTER SYSTEM.
+        requestAnimationFrame(() => {
+          bootBarFill.classList.add('lab-boot-full');
+        });
 
-  .setup-item h3 {
-    font-size: 1.2rem;
-    margin-top: 0;
-    margin-bottom: var(--space-xs);
-    color: var(--color-accent);
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--space-xs);
-  }
+        const duration = 1400;
+        const start = performance.now();
+        function tick(now: number) {
+          const elapsed = now - start;
+          const pct = Math.min(100, Math.round((elapsed / duration) * 100));
+          if (bootPct) bootPct.textContent = `${pct}%`;
+          if (elapsed < duration) {
+            requestAnimationFrame(tick);
+          } else {
+            if (bootPct) bootPct.textContent = '100%';
+            if (bootEnter) bootEnter.hidden = false;
+          }
+        }
+        requestAnimationFrame(tick);
+      }
 
-  .setup-item p {
-    margin: var(--space-xs) 0;
-  }
-  
-  .setup-item ul {
-    margin: var(--space-xs) 0;
-    padding-left: 1.5rem;
-  }
-  
-  .setup-item li {
-    margin-bottom: 0.35rem;
-  }
+      if (!alreadyBooted && !prefersReducedMotion) {
+        showBoot();
+      } else if (!alreadyBooted && prefersReducedMotion) {
+        showBoot();
+      }
+      // If alreadyBooted, overlay stays hidden (default markup state).
 
-  .setup-footer {
-    text-align: center;
-    font-style: italic;
-    margin-top: var(--space-md);
-    color: var(--color-muted);
-  }
+      bootEnter?.addEventListener('click', () => hideBoot(false));
 
-  .posts {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-    max-width: 800px;
-    margin: 0 auto;
-  }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && bootEl && !bootEl.hidden) {
+          hideBoot(false);
+        }
+      });
 
-  .post-card {
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
+      // ---------- Workspace switching ----------
 
-  .post-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+      const scenes = Array.from(document.querySelectorAll<HTMLElement>('.lab-scene'));
+      const wsButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.lab-ws'));
 
-  .post-content {
-    flex: 1;
-  }
+      function activateWorkspace(id: string) {
+        scenes.forEach((scene) => {
+          scene.classList.toggle('active', scene.dataset.scene === id);
+        });
+        wsButtons.forEach((btn) => {
+          const isActive = btn.dataset.workspace === id;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
 
-  .post-date {
-    font-size: 0.9rem;
-    color: var(--color-muted);
-    margin-bottom: var(--space-xs);
-  }
+      wsButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.workspace;
+          if (id) activateWorkspace(id);
+        });
+      });
 
-  .post-excerpt {
-    color: var(--color-text);
-    margin-bottom: var(--space-sm);
-  }
+      document.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const target = e.target as HTMLElement | null;
+        if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
 
-  .read-more {
-    font-weight: 600;
-    display: inline-block;
-  }
+        if (['1', '2', '3', '4'].includes(e.key)) {
+          activateWorkspace(e.key);
+        }
+      });
 
-  .post-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: var(--space-sm);
-  }
+      // ---------- Live clock ----------
 
-  .tag {
-    font-size: 0.8rem;
-    background-color: var(--color-accent);
-    color: white;
-    padding: 0.2rem 0.6rem;
-    border-radius: 1rem;
-    display: inline-block;
-  }
-
-  @media (max-width: 768px) {
-    .lab-header h1 {
-      font-size: 2.5rem;
-    }
-    
-    .lab-header p {
-      font-size: 1rem;
-    }
-    
-    .setup-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
+      const clockEl = document.getElementById('lab-clock');
+      function updateClock() {
+        if (!clockEl) return;
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        clockEl.textContent = `${hh}:${mm}`;
+      }
+      updateClock();
+      setInterval(updateClock, 60000);
+    </script>
+  </body>
+</html>

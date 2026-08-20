@@ -1,0 +1,146 @@
+---
+// Boot overlay. Default hidden in markup; JS decides whether to show it
+// (skipped on repeat visits via sessionStorage, and under reduced motion
+// the bar starts full with the button visible immediately).
+---
+
+<div class="lab-boot" id="lab-boot" hidden>
+  <div class="lab-boot-inner">
+    <div class="lab-boot-logotype">PJ<span class="lab-us">_</span></div>
+    <div class="lab-boot-init">initializing lab<span class="lab-boot-dots">...</span></div>
+    <div class="lab-boot-bar-row">
+      <div class="lab-boot-bar"><div class="lab-boot-bar-fill" id="lab-boot-bar-fill"></div></div>
+      <span class="lab-boot-pct" id="lab-boot-pct">0%</span>
+    </div>
+    <button type="button" class="lab-boot-enter" id="lab-boot-enter" hidden>ENTER SYSTEM</button>
+    <div class="lab-boot-hints">ESC TO SKIP &nbsp;&middot;&nbsp; SKIPPED AUTOMATICALLY ON RETURN VISITS &nbsp;&middot;&nbsp; RESPECTS REDUCED MOTION</div>
+  </div>
+</div>
+
+<style>
+  .lab-boot {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--lab-boot-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-boot {
+      transition: opacity 200ms ease;
+    }
+
+    .lab-boot.lab-boot-fade {
+      opacity: 0;
+    }
+  }
+
+  .lab-boot-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 24px;
+  }
+
+  .lab-boot-logotype {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--lab-bright);
+  }
+
+  .lab-boot-logotype .lab-us {
+    color: var(--lab-sage);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-boot-logotype .lab-us {
+      animation: lab-blink 1.1s steps(1) infinite;
+    }
+  }
+
+  .lab-boot-init {
+    font-size: 18px;
+    letter-spacing: 0.12em;
+    color: var(--lab-text);
+  }
+
+  .lab-boot-dots {
+    color: var(--lab-muted);
+  }
+
+  .lab-boot-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .lab-boot-bar {
+    width: 320px;
+    max-width: 60vw;
+    height: 16px;
+    border: 1px solid var(--lab-border);
+    padding: 2px;
+  }
+
+  .lab-boot-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: repeating-linear-gradient(90deg, var(--lab-sage) 0 14px, var(--lab-boot-bg) 14px 17px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-boot-bar-fill {
+      transition: width 1.4s ease;
+    }
+  }
+
+  .lab-boot-bar-fill.lab-boot-full {
+    width: 100%;
+  }
+
+  .lab-boot-pct {
+    font-size: 14px;
+    color: var(--lab-muted);
+    letter-spacing: 0.12em;
+  }
+
+  .lab-boot-enter {
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    padding: 16px 42px;
+    background: transparent;
+    color: var(--lab-bright);
+    border: 1px solid var(--lab-sage);
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-boot-enter {
+      transition: background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+    }
+
+    .lab-boot-enter:active {
+      transform: translateY(2px);
+    }
+  }
+
+  .lab-boot-enter:hover {
+    background: var(--lab-sage);
+    color: var(--lab-boot-bg);
+  }
+
+  .lab-boot-hints {
+    margin-top: 28px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--lab-dim);
+    text-align: center;
+    max-width: 80vw;
+  }
+</style>

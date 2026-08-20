@@ -1,0 +1,284 @@
+---
+// Workspace 1: network topology. Static in phase 1 (node clicks arrive in phase 2).
+const nodes = [
+  { name: '[ security-pve ]', meta: 'N150 · CORAL TPU', svc: 'FRIGATE', status: 'ONLINE', idle: false },
+  { name: '[ ser5-proxmox ]', meta: 'RYZEN 7 5850U · 27G', svc: 'COOLIFY · HOME ASSISTANT', status: 'ONLINE', idle: false },
+  { name: '[ pve-ser-24gb ]', meta: 'RYZEN 7 6800U · 19G', svc: 'KATZENBASE · IMMICH · CI', status: 'ONLINE', idle: false },
+  { name: '[ s13-proxmox ]', meta: 'N150 · SPARE', svc: 'IDLE // AWAITING PURPOSE', status: 'ONLINE', idle: true },
+  { name: '[ joseph-nas ]', meta: 'NODE 304 · ZFS 4×HDD', svc: 'NFS EXPORTS ×4', status: 'ONLINE · 58% USED', idle: false },
+];
+---
+
+<section class="lab-scene lab-network active" data-scene="1" role="tabpanel" aria-label="Network topology">
+  <div class="lab-net-topo">
+    <div class="lab-tbox lab-tbox-wan">
+      <span class="lab-tlabel">WAN</span>
+      <span class="lab-tname">/// ATT FIBER ///</span>
+    </div>
+    <div class="lab-vline lab-vline-1"></div>
+
+    <div class="lab-tbox lab-tbox-gw">
+      <span class="lab-tlabel">GATEWAY</span>
+      <span class="lab-tname">UCG FIBER</span>
+      <span class="lab-tstat"><span class="lab-dot"></span> ONLINE · 10G WAN</span>
+    </div>
+    <div class="lab-vline lab-vline-2"></div>
+
+    <div class="lab-tbox lab-tbox-sw">
+      <span class="lab-tlabel">SWITCH</span>
+      <span class="lab-tname">USW-LITE-16-POE</span>
+      <span class="lab-tstat"><span class="lab-dot"></span> ONLINE · 48 CLIENTS</span>
+    </div>
+
+    <div class="lab-hline lab-hline-dashed"></div>
+    <div class="lab-tbox lab-tbox-tunnel">
+      <span class="lab-tlabel">INGRESS</span>
+      <span class="lab-tname">CLOUDFLARE TUNNEL</span>
+      <span class="lab-tstat">ONLY WAY IN ⇄</span>
+    </div>
+
+    <div class="lab-vline lab-vline-rail"></div>
+
+    <div class="lab-node-rail">
+      {nodes.map((node) => (
+        <div class:list={['lab-node', { 'lab-node-idle': node.idle }]}>
+          <span class="lab-nname">{node.name}</span>
+          <span class="lab-nmeta">{node.meta}</span>
+          <span class="lab-nsvc">
+            {node.svc}
+            {node.idle && <span class="lab-caret">▮</span>}
+          </span>
+          <span class="lab-tstat"><span class="lab-dot"></span> {node.status}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="lab-window lab-inspector">
+      <div class="lab-titlebar">
+        <span class="lab-tb-title">security-pve — node inspector</span>
+        <span class="lab-tb-x">✕</span>
+      </div>
+      <div class="lab-win-body">
+        <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v">INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
+        <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v">PROXMOX VE 8.4 · KERNEL 6.14</span></div>
+        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" style="width:34%"></div></div><span class="lab-gval">34%</span></div>
+        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" style="width:31%"></div></div><span class="lab-gval">31%</span></div>
+        <div class="lab-svc-head">SERVICES</div>
+        <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
+        <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
+        <div class="lab-win-foot">$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-hintbar">CLICK A NODE TO INSPECT&nbsp;&nbsp;&middot;&nbsp;&nbsp;WINDOWS TILE&nbsp;&nbsp;&middot;&nbsp;&nbsp;[SPACE] PALETTE&nbsp;&nbsp;&middot;&nbsp;&nbsp;4:LOG IS THE WAY BACK TO THE CALM SITE</div>
+</section>
+
+<style>
+  .lab-net-topo {
+    position: relative;
+    min-height: 760px;
+    padding: 0 0 56px;
+  }
+
+  .lab-tbox {
+    position: absolute;
+    left: 200px;
+    width: 280px;
+    border: 1px solid var(--lab-border);
+    background: var(--lab-surface);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .lab-tbox-wan {
+    top: 24px;
+    background: transparent;
+    border-style: dashed;
+  }
+
+  .lab-tbox-gw {
+    top: 102px;
+  }
+
+  .lab-tbox-sw {
+    top: 208px;
+  }
+
+  .lab-tbox-tunnel {
+    top: 110px;
+    left: 570px;
+    width: 230px;
+    border-color: var(--lab-border-bright);
+  }
+
+  .lab-tlabel {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--lab-muted);
+  }
+
+  .lab-tname {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: var(--lab-bright);
+  }
+
+  .lab-tstat {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--lab-sage);
+  }
+
+  .lab-vline {
+    position: absolute;
+    left: 339px;
+    width: 2px;
+    background: var(--lab-border);
+  }
+
+  .lab-vline-1 {
+    top: 78px;
+    height: 24px;
+  }
+
+  .lab-vline-2 {
+    top: 174px;
+    height: 34px;
+  }
+
+  .lab-vline-rail {
+    left: 240px;
+    top: 280px;
+    height: 452px;
+  }
+
+  .lab-hline {
+    position: absolute;
+    height: 2px;
+    background: var(--lab-border);
+    left: 480px;
+    top: 138px;
+    width: 90px;
+  }
+
+  .lab-hline-dashed {
+    background: repeating-linear-gradient(90deg, var(--lab-border) 0 6px, transparent 6px 11px);
+  }
+
+  .lab-node-rail {
+    position: absolute;
+    left: 280px;
+    top: 300px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .lab-node {
+    position: relative;
+    border: 1px solid var(--lab-border);
+    background: var(--lab-surface);
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 12px;
+    cursor: pointer;
+  }
+
+  .lab-node::before {
+    content: '';
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    width: 40px;
+    height: 2px;
+    background: var(--lab-border);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-node {
+      transition: border-color 0.12s ease, transform 0.08s ease;
+    }
+
+    .lab-node:active {
+      transform: translate(1px, 1px);
+    }
+  }
+
+  .lab-node:hover {
+    border-color: var(--lab-sage);
+  }
+
+  .lab-nname {
+    font-size: 13px;
+    color: var(--lab-bright);
+    letter-spacing: 0.06em;
+  }
+
+  .lab-nmeta {
+    font-size: 10px;
+    color: var(--lab-muted);
+    letter-spacing: 0.1em;
+    text-align: right;
+  }
+
+  .lab-nsvc {
+    font-size: 10px;
+    color: var(--lab-accent);
+    letter-spacing: 0.12em;
+  }
+
+  .lab-node .lab-tstat {
+    text-align: right;
+  }
+
+  .lab-node-idle .lab-nsvc {
+    color: var(--lab-muted);
+  }
+
+  .lab-inspector {
+    position: absolute;
+    left: 790px;
+    top: 110px;
+    width: 520px;
+  }
+
+  @media (max-width: 900px) {
+    .lab-net-topo {
+      min-height: 0;
+      padding: 20px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .lab-tbox,
+    .lab-node-rail,
+    .lab-inspector {
+      position: static;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .lab-tbox-tunnel {
+      border-style: dashed;
+    }
+
+    .lab-vline,
+    .lab-hline {
+      display: none;
+    }
+
+    .lab-node-rail {
+      gap: 12px;
+    }
+
+    .lab-node::before {
+      display: none;
+    }
+  }
+</style>
