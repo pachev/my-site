@@ -103,11 +103,9 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
       const bootEnter = document.getElementById('lab-boot-enter') as HTMLButtonElement | null;
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const alreadyBooted = sessionStorage.getItem('lab-booted') === '1';
 
       function hideBoot(instant: boolean) {
         if (!bootEl) return;
-        sessionStorage.setItem('lab-booted', '1');
 
         if (instant || prefersReducedMotion) {
           bootEl.hidden = true;
@@ -152,10 +150,8 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
         requestAnimationFrame(tick);
       }
 
-      if (!alreadyBooted) {
-        showBoot();
-      }
-      // If alreadyBooted, overlay stays hidden (default markup state).
+      // The boot sequence plays on every entry; ESC or ENTER SYSTEM dismisses it.
+      showBoot();
 
       bootEnter?.addEventListener('click', () => hideBoot(false));
 

@@ -127,6 +127,9 @@
   position: absolute;
   inset: 0;
   overflow: auto;
+  /* Reserve the scrollbar column even when content fits, so switching
+     between scrolling and non-scrolling scenes never shifts the layout. */
+  scrollbar-gutter: stable;
   display: none;
 }
 
@@ -134,16 +137,18 @@
   display: block;
 }
 
+/* Entrance runs as a keyframe animation, not a transition: transitions
+   started in the same frame as a display flip fire inconsistently. */
 @media (prefers-reduced-motion: no-preference) {
-  .lab-scene {
+  .lab-scene.active {
+    animation: lab-scene-in 200ms ease;
+  }
+}
+
+@keyframes lab-scene-in {
+  from {
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 200ms ease, transform 200ms ease;
-  }
-
-  .lab-scene.active {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

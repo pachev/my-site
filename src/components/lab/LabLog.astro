@@ -13,11 +13,15 @@ const formatDate = (date: Date) =>
     .replace(',', '');
 
 const systemEvents = [
+  { date: 'AUG 15 2026', message: 'Deployed excalidraw for fun. It has since become the vault', warn: false },
+  { date: 'AUG 14 2026', message: 'forgejo online in ct 211. Git at home, as intended', warn: false },
   { date: 'AUG 11 2026', message: 'Replaced Debian LXCs with NixOS containers: frigate, immich, github-runner', warn: false },
   { date: 'AUG 11 2026', message: 'Deployed telegraf on every node, pointed at VictoriaMetrics. The lab has vitals now', warn: false },
   { date: 'AUG 10 2026', message: 'Destroyed palworld server. No survivors', warn: false },
+  { date: 'AUG 09 2026', message: 'atuin in ct 110. Every shell command on every box, synced and searchable', warn: false },
   { date: 'AUG 06 2026', message: 'Migrated all NFS mounts from raw IPs to DNS names, then rebooted the whole cluster', warn: false },
   { date: 'AUG 06 2026', message: 'ser-24gb took five power cycles to come back. Nothing was wrong. Hardware is haunted', warn: true },
+  { date: 'JUL 2026', message: 'Pointed immich at the entire photo library. The NAS accepted its fate', warn: false },
   { date: 'JUL 2026', message: 'Replaced the stock ATT gateway with a full UniFi stack. The BGW210 lives on in bridge-mode purgatory', warn: false },
   { date: 'MAR 2025', message: 'Racked everything into a 15U open frame. It has a patch panel now. This is a real lab', warn: false },
 ];
@@ -59,6 +63,9 @@ const systemEvents = [
     margin: 40px auto 56px;
     max-width: 1080px;
     width: calc(100% - 96px);
+    /* Margins (96px) plus the hintbar (~40px): the terminal stretches to
+       match the other scenes so the hintbar sits at the same height. */
+    min-height: calc(100% - 136px);
     padding: 36px 44px;
     display: flex;
     flex-direction: column;

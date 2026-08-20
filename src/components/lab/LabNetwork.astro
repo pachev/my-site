@@ -73,13 +73,15 @@ const nodes = [
     </div>
   </div>
 
-  <div class="lab-hintbar">CLICK A NODE TO INSPECT&nbsp;&nbsp;&middot;&nbsp;&nbsp;WINDOWS TILE&nbsp;&nbsp;&middot;&nbsp;&nbsp;[SPACE] PALETTE&nbsp;&nbsp;&middot;&nbsp;&nbsp;4:LOG IS THE WAY BACK TO THE CALM SITE</div>
+  <div class="lab-hintbar">CLICK A NODE TO INSPECT&nbsp;&nbsp;&middot;&nbsp;&nbsp;KEYS 1&ndash;4 SWITCH WORKSPACES&nbsp;&nbsp;&middot;&nbsp;&nbsp;THE TUNNEL IS THE ONLY WAY IN</div>
 </section>
 
 <style>
   .lab-net-topo {
     position: relative;
-    min-height: 760px;
+    /* 760px fits the absolute topology; the max() keeps this scene as tall
+       as the others so the hintbar never jumps between workspaces. */
+    min-height: max(760px, calc(100% - 40px));
     padding: 0 0 56px;
   }
 

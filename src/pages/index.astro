@@ -31,7 +31,7 @@ const formatDate = (date: Date) => date.toISOString().slice(0, 10);
         </div>
       </div>
 
-      <div class="terminal-card">
+      <a href="/lab" class="terminal-card" aria-label="Enter the lab desktop">
         <div class="terminal-titlebar">
           <span class="dot dot-sage"></span>
           <span class="dot dot-outline"></span>
@@ -43,9 +43,9 @@ const formatDate = (date: Date) => date.toISOString().slice(0, 10);
           <div class="bright">software engineer. homelab tinkerer.</div>
           <div><span class="prompt">$</span> ls ~/writing</div>
           <div class="bright">posts/&nbsp;&nbsp;tils/&nbsp;&nbsp;lab/&nbsp;&nbsp;essays/</div>
-          <div><span class="prompt">$</span> <span class="caret"></span></div>
+          <div><span class="prompt">$</span> cd lab/<span class="caret"></span></div>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 
@@ -175,6 +175,7 @@ const formatDate = (date: Date) => date.toISOString().slice(0, 10);
   }
 
   .terminal-card {
+    display: block;
     width: clamp(440px, 30vw, 600px);
     flex-shrink: 0;
     background: var(--color-terminal-bg);
@@ -183,6 +184,22 @@ const formatDate = (date: Date) => date.toISOString().slice(0, 10);
     font-family: var(--font-mono);
     font-size: clamp(13px, 0.8vw, 15px);
     line-height: 1.85;
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .terminal-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+  }
+
+  .terminal-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 15px 15px 0 #82928055;
+  }
+
+  .terminal-card:hover .caret {
+    background: var(--color-sage);
   }
 
   .terminal-titlebar {
