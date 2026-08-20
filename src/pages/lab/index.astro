@@ -198,6 +198,134 @@ const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.dat
         }
       });
 
+      // ---------- Network: node click drives the inspector ----------
+
+      type NodeInfo = {
+        hw: string;
+        platform: string;
+        cpu: number;
+        ram: number;
+        svcs: [string, string][];
+        foot: string;
+      };
+
+      const NODE_DATA: Record<string, NodeInfo> = {
+        'security-pve': {
+          hw: 'INTEL N150 · 4C · 15G · CORAL TPU (USB)',
+          platform: 'PROXMOX VE 8.4 · KERNEL 6.14',
+          cpu: 34,
+          ram: 31,
+          svcs: [['frigate', 'nixos ct 205 · 6 cameras'], ['coral-tpu', 'inference 8.1ms']],
+          foot: '$ uptime → 13 days. do not jinx it.',
+        },
+        'ser5-proxmox': {
+          hw: 'RYZEN 7 5850U · 16C · 27G',
+          platform: 'PROXMOX VE 8.4 · KERNEL 6.11',
+          cpu: 4,
+          ram: 70,
+          svcs: [['coolify', 'ships this very site'], ['home-assistant', 'vm 108'], ['adguard', 'dns for everything'], ['excalidraw', 'team whiteboard'], ['forgejo', 'ct 211 · git at home'], ['atuin', 'ct 110 · shell history'], ['metrics', 'ct 208 · victoriametrics']],
+          foot: '$ uptime → 13 days. the elder node.',
+        },
+        'pve-ser-24gb': {
+          hw: 'RYZEN 7 6800U · 16C · 19G',
+          platform: 'PROXMOX VE 8.4 · KERNEL 6.8',
+          cpu: 5,
+          ram: 27,
+          svcs: [['katzenbase', 'the second brain'], ['immich', 'nixos ct 206'], ['mast', 'lxc 200'], ['hermes-agent', 'lxc 109'], ['github-runner', 'ci, nixos ct 207']],
+          foot: '$ uptime → 6 days. once took five power cycles. haunted.',
+        },
+        's13-proxmox': {
+          hw: 'INTEL N150 · 4C · 15G',
+          platform: 'PROXMOX VE 8.4 · KERNEL 6.14',
+          cpu: 2,
+          ram: 13,
+          svcs: [],
+          foot: '$ uptime → 9 days. doing nothing, flawlessly.',
+        },
+        'joseph-nas': {
+          hw: 'RYZEN 5 · NODE 304 · 16G · ZFS 4×HDD',
+          platform: 'UBUNTU SERVER · NFS + ZFS',
+          cpu: 2,
+          ram: 67,
+          svcs: [['nfs', '4 exports'], ['telegraf', 'vitals to victoriametrics'], ['zpool scrub', '0 errors']],
+          foot: '$ uptime → 15.9 weeks. the adult in the room.',
+        },
+      };
+
+      const inspTitle = document.getElementById('lab-insp-title');
+      const inspHw = document.getElementById('lab-insp-hw');
+      const inspPlatform = document.getElementById('lab-insp-platform');
+      const inspCpuFill = document.getElementById('lab-insp-cpu-fill');
+      const inspCpuVal = document.getElementById('lab-insp-cpu-val');
+      const inspRamFill = document.getElementById('lab-insp-ram-fill');
+      const inspRamVal = document.getElementById('lab-insp-ram-val');
+      const inspSvcs = document.getElementById('lab-insp-svcs');
+      const inspFoot = document.getElementById('lab-insp-foot');
+      const nodeCards = Array.from(document.querySelectorAll<HTMLElement>('.lab-node[data-node]'));
+
+      function inspectNode(id: string) {
+        const info = NODE_DATA[id];
+        if (!info || !inspSvcs) return;
+
+        if (inspTitle) inspTitle.textContent = `${id} — node inspector`;
+        if (inspHw) inspHw.textContent = info.hw;
+        if (inspPlatform) inspPlatform.textContent = info.platform;
+        if (inspCpuFill) inspCpuFill.style.width = `${info.cpu}%`;
+        if (inspCpuVal) inspCpuVal.textContent = `${info.cpu}%`;
+        if (inspRamFill) inspRamFill.style.width = `${info.ram}%`;
+        if (inspRamVal) inspRamVal.textContent = `${info.ram}%`;
+
+        inspSvcs.textContent = '';
+        if (info.svcs.length === 0) {
+          const idle = document.createElement('div');
+          idle.className = 'lab-idle-msg';
+          idle.textContent = 'NONE. IDLE // AWAITING PURPOSE';
+          inspSvcs.appendChild(idle);
+        } else {
+          for (const [name, note] of info.svcs) {
+            const row = document.createElement('div');
+            row.className = 'lab-svc';
+            const dot = document.createElement('span');
+            dot.className = 'lab-dot';
+            const noteEl = document.createElement('span');
+            noteEl.className = 'lab-svc-note';
+            noteEl.textContent = note;
+            row.appendChild(dot);
+            row.appendChild(document.createTextNode(` ${name} `));
+            row.appendChild(noteEl);
+            inspSvcs.appendChild(row);
+          }
+        }
+
+        if (inspFoot) {
+          inspFoot.textContent = info.foot;
+          const caret = document.createElement('span');
+          caret.className = 'lab-caret';
+          caret.textContent = '▮';
+          inspFoot.appendChild(caret);
+        }
+
+        nodeCards.forEach((card) => {
+          card.classList.toggle('lab-node-selected', card.dataset.node === id);
+        });
+      }
+
+      nodeCards.forEach((card) => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.node;
+          if (id) inspectNode(id);
+        });
+      });
+
+      // ---------- Compute: click a tile to focus it ----------
+
+      const tiles = Array.from(document.querySelectorAll<HTMLElement>('.lab-tile'));
+      tiles.forEach((tile) => {
+        tile.addEventListener('click', () => {
+          tiles.forEach((t) => t.classList.toggle('lab-tile-focused', t === tile));
+        });
+      });
+
       // ---------- Live clock ----------
 
       const clockEl = document.getElementById('lab-clock');

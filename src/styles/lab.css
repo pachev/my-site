@@ -299,3 +299,16 @@
     inset: 84px 0 0 0;
   }
 }
+
+.lab-wb-exit {
+  margin-left: 24px;
+  color: var(--lab-muted);
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+
+.lab-wb-exit:hover {
+  color: var(--lab-bright);
+  box-shadow: inset 0 -2px 0 var(--lab-sage);
+}

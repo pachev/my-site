@@ -1,11 +1,11 @@
 ---
 // Workspace 1: network topology. Static in phase 1 (node clicks arrive in phase 2).
 const nodes = [
-  { name: '[ security-pve ]', meta: 'N150 · CORAL TPU', svc: 'FRIGATE', status: 'ONLINE', idle: false },
-  { name: '[ ser5-proxmox ]', meta: 'RYZEN 7 5850U · 27G', svc: 'COOLIFY · HOME ASSISTANT', status: 'ONLINE', idle: false },
-  { name: '[ pve-ser-24gb ]', meta: 'RYZEN 7 6800U · 19G', svc: 'KATZENBASE · IMMICH · CI', status: 'ONLINE', idle: false },
-  { name: '[ s13-proxmox ]', meta: 'N150 · SPARE', svc: 'IDLE // AWAITING PURPOSE', status: 'ONLINE', idle: true },
-  { name: '[ joseph-nas ]', meta: 'NODE 304 · ZFS 4×HDD', svc: 'NFS EXPORTS ×4', status: 'ONLINE · 58% USED', idle: false },
+  { id: 'security-pve', name: '[ security-pve ]', meta: 'N150 · CORAL TPU', svc: 'FRIGATE', status: 'ONLINE', idle: false },
+  { id: 'ser5-proxmox', name: '[ ser5-proxmox ]', meta: 'RYZEN 7 5850U · 27G', svc: 'COOLIFY · HOME ASSISTANT', status: 'ONLINE', idle: false },
+  { id: 'pve-ser-24gb', name: '[ pve-ser-24gb ]', meta: 'RYZEN 7 6800U · 19G', svc: 'KATZENBASE · IMMICH · CI', status: 'ONLINE', idle: false },
+  { id: 's13-proxmox', name: '[ s13-proxmox ]', meta: 'N150 · SPARE', svc: 'IDLE // AWAITING PURPOSE', status: 'ONLINE', idle: true },
+  { id: 'joseph-nas', name: '[ joseph-nas ]', meta: 'NODE 304 · ZFS 4×HDD', svc: 'NFS EXPORTS ×4', status: 'ONLINE · 58% USED', idle: false },
 ];
 ---
 
@@ -41,7 +41,7 @@ const nodes = [
 
     <div class="lab-node-rail">
       {nodes.map((node) => (
-        <div class:list={['lab-node', { 'lab-node-idle': node.idle }]}>
+        <div class:list={['lab-node', { 'lab-node-idle': node.idle, 'lab-node-selected': node.id === 'security-pve' }]} data-node={node.id}>
           <span class="lab-nname">{node.name}</span>
           <span class="lab-nmeta">{node.meta}</span>
           <span class="lab-nsvc">
@@ -55,18 +55,20 @@ const nodes = [
 
     <div class="lab-window lab-inspector">
       <div class="lab-titlebar">
-        <span class="lab-tb-title">security-pve — node inspector</span>
+        <span class="lab-tb-title" id="lab-insp-title">security-pve — node inspector</span>
         <span class="lab-tb-x">✕</span>
       </div>
       <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v">INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
-        <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v">PROXMOX VE 8.4 · KERNEL 6.14</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" style="width:34%"></div></div><span class="lab-gval">34%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" style="width:31%"></div></div><span class="lab-gval">31%</span></div>
+        <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" id="lab-insp-hw">INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
+        <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" id="lab-insp-platform">PROXMOX VE 8.4 · KERNEL 6.14</span></div>
+        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" id="lab-insp-cpu-fill" style="width:34%"></div></div><span class="lab-gval" id="lab-insp-cpu-val">34%</span></div>
+        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" id="lab-insp-ram-fill" style="width:31%"></div></div><span class="lab-gval" id="lab-insp-ram-val">31%</span></div>
         <div class="lab-svc-head">SERVICES</div>
-        <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
-        <div class="lab-win-foot">$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
+        <div id="lab-insp-svcs">
+          <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
+          <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
+        </div>
+        <div class="lab-win-foot" id="lab-insp-foot">$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
       </div>
     </div>
   </div>
@@ -211,6 +213,11 @@ const nodes = [
 
   .lab-node:hover {
     border-color: var(--lab-sage);
+  }
+
+  .lab-node-selected {
+    border-color: var(--lab-sage);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.45);
   }
 
   .lab-nname {
