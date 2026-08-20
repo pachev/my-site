@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+  <style>
+    body { margin: 0; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .desktop {
+    width: 1440px;
+    height: 900px;
+    background: #121411;
+    font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #c9cec4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waybar {
+    height: 48px;
+    background: #191b18;
+    border-bottom: 1px solid #2e312b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+  }
+
+  .wb-left { font-weight: 700; color: #f2f0e9; }
+  .us { color: #a3b3a0; }
+  .wb-ws { display: flex; gap: 28px; }
+  .ws { color: #6d7268; padding: 4px 0; cursor: pointer; }
+  .ws:hover { color: #c9cec4; }
+  .ws.active { color: #f2f0e9; box-shadow: inset 0 -2px 0 #a3b3a0; }
+  .wb-right { color: #6d7268; display: flex; align-items: center; gap: 8px; }
+
+  .dot { display: inline-block; width: 7px; height: 7px; background: #a3b3a0; margin-right: 4px; }
+
+  .scene {
+    position: absolute;
+    inset: 48px 0 0 0;
+    display: grid;
+    grid-template-columns: 360px 1fr 360px;
+    align-items: center;
+    padding: 0 48px 56px;
+    gap: 32px;
+  }
+
+  .bays { display: flex; flex-direction: column; gap: 12px; }
+  .bay-head { font-size: 10px; letter-spacing: 0.22em; color: #6d7268; margin-bottom: 8px; }
+
+  .bay {
+    border: 1px solid #2e312b;
+    background: #191b18;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.12s ease;
+  }
+
+  .bay:hover { border-color: #a3b3a0; }
+  .bay-id { font-size: 10px; letter-spacing: 0.18em; color: #6d7268; width: 48px; }
+  .bay-model { font-size: 12px; color: #f2f0e9; letter-spacing: 0.06em; }
+  .bay-stat { margin-left: auto; font-size: 10px; letter-spacing: 0.14em; color: #a3b3a0; }
+
+  .core { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+  .ring { border: 1px solid #2e312b; padding: 22px; }
+  .ring.r2 { border-color: #3a3e36; }
+  .ring.r3 { border-color: #a3b3a0; box-shadow: 0 0 42px rgba(163, 179, 160, 0.18); }
+
+  .core-inner {
+    width: 220px;
+    height: 220px;
+    background: #191b18;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .core-label { font-size: 10px; letter-spacing: 0.26em; color: #6d7268; }
+  .core-name { font-size: 15px; color: #c9cec4; letter-spacing: 0.08em; }
+  .core-pct { font-size: 52px; font-weight: 700; color: #f2f0e9; line-height: 1; margin-top: 6px; }
+  .core-sub { font-size: 11px; color: #829280; letter-spacing: 0.14em; }
+
+  .core-caption {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4c5148;
+    text-align: center;
+    max-width: 340px;
+    line-height: 1.8;
+  }
+
+  .stats { display: flex; flex-direction: column; gap: 12px; }
+  .stat-head { font-size: 10px; letter-spacing: 0.22em; color: #6d7268; margin-bottom: 2px; }
+  .stat-head.second { margin-top: 16px; }
+
+  .stat { display: flex; align-items: center; gap: 12px; }
+  .sk { font-size: 10px; letter-spacing: 0.14em; color: #6d7268; width: 72px; flex-shrink: 0; }
+  .gauge { flex: 1; height: 12px; border: 1px solid #2e312b; padding: 2px; }
+  .gfill { height: 100%; background: repeating-linear-gradient(90deg, #a3b3a0 0 8px, #191b18 8px 10px); }
+  .sv { font-size: 11px; color: #c9cec4; width: 46px; text-align: right; }
+
+  .exp { font-size: 12px; color: #c9cec4; display: flex; align-items: center; gap: 6px; }
+  .exp-note { color: #6d7268; font-size: 10px; letter-spacing: 0.08em; margin-left: auto; }
+
+  .scrub { font-size: 12px; color: #a3b3a0; letter-spacing: 0.1em; line-height: 1.9; }
+  .scrub-note { color: #6d7268; font-size: 10px; }
+
+  .hintbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 28px;
+    border-top: 1px solid #2e312b;
+    background: #191b18;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4c5148;
+    text-align: center;
+  }
+  </style>
+</helmet>
+
+<div class="desktop">
+  <div class="waybar">
+    <div class="wb-left">PJ<span class="us">_</span>&nbsp;&nbsp;LAB</div>
+    <div class="wb-ws">
+      <span class="ws">1:NETWORK</span>
+      <span class="ws">2:COMPUTE</span>
+      <span class="ws active">3:STORAGE</span>
+      <span class="ws">4:LOG</span>
+    </div>
+    <div class="wb-right"><span class="dot ok"></span> POOL ONLINE&nbsp;&nbsp;&nbsp;SCRUB OK&nbsp;&nbsp;&nbsp;21:12</div>
+  </div>
+
+  <div class="scene">
+    <!-- drive bays -->
+    <div class="bays">
+      <div class="bay-head">DRIVE BAYS · FRACTAL NODE 304</div>
+      <div class="bay"><span class="bay-id">BAY 0</span><span class="bay-model">WD RED PLUS 4T</span><span class="bay-stat"><span class="dot ok"></span> ONLINE</span></div>
+      <div class="bay"><span class="bay-id">BAY 1</span><span class="bay-model">WD RED PLUS 4T</span><span class="bay-stat"><span class="dot ok"></span> ONLINE</span></div>
+      <div class="bay"><span class="bay-id">BAY 2</span><span class="bay-model">WD RED 4T</span><span class="bay-stat"><span class="dot ok"></span> ONLINE</span></div>
+      <div class="bay"><span class="bay-id">BAY 3</span><span class="bay-model">WD RED 4T</span><span class="bay-stat"><span class="dot ok"></span> ONLINE</span></div>
+    </div>
+
+    <!-- reactor core -->
+    <div class="core">
+      <div class="ring r1"><div class="ring r2"><div class="ring r3">
+        <div class="core-inner">
+          <div class="core-label">ZFS POOL</div>
+          <div class="core-name">joseph-nas-1</div>
+          <div class="core-pct">68%</div>
+          <div class="core-sub">2.7T / 4.0T</div>
+        </div>
+      </div></div></div>
+      <div class="core-caption">THE CORE. IF THIS BLINKS RED, EVERYTHING ELSE IS DECORATION.</div>
+    </div>
+
+    <!-- stats column -->
+    <div class="stats">
+      <div class="stat-head">POOL TELEMETRY</div>
+      <div class="stat"><span class="sk">ARC HIT</span><div class="gauge"><div class="gfill" style="width:98%"></div></div><span class="sv">98.2%</span></div>
+      <div class="stat"><span class="sk">CAPACITY</span><div class="gauge"><div class="gfill" style="width:68%"></div></div><span class="sv">68%</span></div>
+      <div class="stat"><span class="sk">FRAG</span><div class="gauge"><div class="gfill" style="width:11%"></div></div><span class="sv">11%</span></div>
+
+      <div class="stat-head second">NFS EXPORTS</div>
+      <div class="exp"><span class="dot ok"></span> proxmox <span class="exp-note">cluster shared storage</span></div>
+      <div class="exp"><span class="dot ok"></span> media <span class="exp-note">plex library</span></div>
+      <div class="exp"><span class="dot ok"></span> pgdata <span class="exp-note">atuin · katzenbase</span></div>
+      <div class="exp"><span class="dot ok"></span> photos <span class="exp-note">immich</span></div>
+
+      <div class="stat-head second">LAST SCRUB</div>
+      <div class="scrub">0 ERRORS · 0B REPAIRED<br><span class="scrub-note">as it should be.</span></div>
+    </div>
+
+    <div class="hintbar">MOUNTED BY DNS NAME, NOT IP. LEARNED THAT ONE THE LONG WAY — SEE 4:LOG.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

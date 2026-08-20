@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+  <style>
+    body { margin: 0; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .desktop {
+    width: 1440px;
+    height: 900px;
+    background: #121411;
+    font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #c9cec4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waybar {
+    height: 48px;
+    background: #191b18;
+    border-bottom: 1px solid #2e312b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+  }
+
+  .wb-left { font-weight: 700; color: #f2f0e9; }
+  .us { color: #a3b3a0; }
+
+  .wb-ws { display: flex; gap: 28px; }
+
+  .ws { color: #6d7268; padding: 4px 0; cursor: pointer; }
+  .ws:hover { color: #c9cec4; }
+  .ws.active { color: #f2f0e9; box-shadow: inset 0 -2px 0 #a3b3a0; }
+
+  .wb-right { color: #6d7268; display: flex; align-items: center; gap: 8px; }
+
+  .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #a3b3a0;
+    margin-right: 4px;
+  }
+
+  .scene { position: absolute; inset: 48px 0 0 0; }
+
+  .tbox {
+    position: absolute;
+    border: 1px solid #2e312b;
+    background: #191b18;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tbox.wan { background: transparent; border-style: dashed; }
+  .tbox.tunnel { border-color: #3a3e36; }
+
+  .tlabel { font-size: 9px; letter-spacing: 0.22em; color: #6d7268; }
+  .tname { font-size: 14px; letter-spacing: 0.1em; color: #f2f0e9; }
+  .tstat { font-size: 10px; letter-spacing: 0.14em; color: #a3b3a0; }
+
+  .vline { position: absolute; width: 2px; background: #2e312b; }
+  .hline { position: absolute; height: 2px; background: #2e312b; }
+  .hline.dashed { background: repeating-linear-gradient(90deg, #2e312b 0 6px, transparent 6px 11px); }
+
+  .node {
+    position: absolute;
+    width: 320px;
+    border: 1px solid #2e312b;
+    background: #191b18;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 12px;
+    cursor: pointer;
+    transition: border-color 0.12s ease, transform 0.08s ease;
+  }
+
+  .node:hover { border-color: #a3b3a0; }
+  .node:active { transform: translate(1px, 1px); }
+
+  .nname { font-size: 13px; color: #f2f0e9; letter-spacing: 0.06em; }
+  .nmeta { font-size: 10px; color: #6d7268; letter-spacing: 0.1em; text-align: right; }
+  .nsvc { font-size: 10px; color: #829280; letter-spacing: 0.12em; }
+  .node .tstat { text-align: right; }
+  .node.idle .nsvc { color: #6d7268; }
+
+  .caret {
+    color: #a3b3a0;
+    animation: blink 1.1s steps(1) infinite;
+    margin-left: 4px;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .window {
+    position: absolute;
+    background: #191b18;
+    border: 1px solid #3a3e36;
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.45);
+  }
+
+  .titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #2e312b;
+    background: #1f221d;
+  }
+
+  .tb-title { font-size: 11px; letter-spacing: 0.14em; color: #f2f0e9; }
+  .tb-x { color: #6d7268; cursor: pointer; font-size: 12px; }
+  .tb-x:hover { color: #c98a7d; }
+
+  .win-body { padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .kv { display: flex; gap: 16px; font-size: 11px; letter-spacing: 0.1em; }
+  .k { color: #6d7268; width: 72px; flex-shrink: 0; font-size: 10px; letter-spacing: 0.18em; padding-top: 1px; }
+  .v { color: #c9cec4; }
+
+  .gauge-row { display: flex; align-items: center; gap: 16px; }
+  .gauge { flex: 1; height: 12px; border: 1px solid #2e312b; padding: 2px; }
+  .gfill { height: 100%; background: repeating-linear-gradient(90deg, #a3b3a0 0 8px, #191b18 8px 10px); }
+  .gval { font-size: 11px; color: #c9cec4; width: 36px; text-align: right; }
+
+  .svc-head { font-size: 10px; letter-spacing: 0.22em; color: #6d7268; margin-top: 6px; }
+  .svc { font-size: 12px; color: #c9cec4; display: flex; align-items: center; gap: 6px; }
+  .svc-note { color: #6d7268; font-size: 10px; letter-spacing: 0.08em; margin-left: auto; }
+
+  .win-foot {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #2e312b;
+    font-size: 11px;
+    color: #829280;
+  }
+
+  .hintbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 28px;
+    border-top: 1px solid #2e312b;
+    background: #191b18;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4c5148;
+    text-align: center;
+  }
+  </style>
+</helmet>
+
+<div class="desktop">
+  <div class="waybar">
+    <div class="wb-left">PJ<span class="us">_</span>&nbsp;&nbsp;LAB</div>
+    <div class="wb-ws">
+      <span class="ws active">1:NETWORK</span>
+      <span class="ws">2:COMPUTE</span>
+      <span class="ws">3:STORAGE</span>
+      <span class="ws">4:LOG</span>
+    </div>
+    <div class="wb-right"><span class="dot ok"></span> 5 NODES&nbsp;&nbsp;&nbsp;ZFS 68%&nbsp;&nbsp;&nbsp;21:12</div>
+  </div>
+
+  <div class="scene">
+    <!-- topology spine -->
+    <div class="tbox wan" style="left:200px; top:64px; width:280px;">
+      <span class="tlabel">WAN</span>
+      <span class="tname">/// ATT FIBER ///</span>
+    </div>
+    <div class="vline" style="left:339px; top:118px; height:34px;"></div>
+
+    <div class="tbox" style="left:200px; top:152px; width:280px;">
+      <span class="tlabel">GATEWAY</span>
+      <span class="tname">UCG FIBER</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE · 10G WAN</span>
+    </div>
+    <div class="vline" style="left:339px; top:224px; height:34px;"></div>
+
+    <div class="tbox" style="left:200px; top:258px; width:280px;">
+      <span class="tlabel">SWITCH</span>
+      <span class="tname">USW-LITE-16-POE</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE · 48 CLIENTS</span>
+    </div>
+
+    <!-- tunnel ingress, dashed to gateway -->
+    <div class="hline dashed" style="left:480px; top:188px; width:90px;"></div>
+    <div class="tbox tunnel" style="left:570px; top:160px; width:230px;">
+      <span class="tlabel">INGRESS</span>
+      <span class="tname">CLOUDFLARE TUNNEL</span>
+      <span class="tstat">ONLY WAY IN ⇄</span>
+    </div>
+
+    <!-- rail from switch down to node stubs -->
+    <div class="vline" style="left:240px; top:330px; height:378px;"></div>
+
+    <div class="hline" style="left:240px; top:388px; width:40px;"></div>
+    <div class="node" style="left:280px; top:362px;">
+      <span class="nname">[ security-pve ]</span>
+      <span class="nmeta">N150 · CORAL TPU</span>
+      <span class="nsvc">FRIGATE</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE</span>
+    </div>
+
+    <div class="hline" style="left:240px; top:468px; width:40px;"></div>
+    <div class="node" style="left:280px; top:442px;">
+      <span class="nname">[ ser5-proxmox ]</span>
+      <span class="nmeta">RYZEN 7 5850U · 27G</span>
+      <span class="nsvc">COOLIFY · HOME ASSISTANT</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE</span>
+    </div>
+
+    <div class="hline" style="left:240px; top:548px; width:40px;"></div>
+    <div class="node" style="left:280px; top:522px;">
+      <span class="nname">[ pve-ser-24gb ]</span>
+      <span class="nmeta">RYZEN 7 6800U · 19G</span>
+      <span class="nsvc">KATZENBASE · IMMICH · CI</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE</span>
+    </div>
+
+    <div class="hline" style="left:240px; top:628px; width:40px;"></div>
+    <div class="node idle" style="left:280px; top:602px;">
+      <span class="nname">[ s13-proxmox ]</span>
+      <span class="nmeta">N150 · SPARE</span>
+      <span class="nsvc">IDLE // AWAITING PURPOSE<span class="caret">▮</span></span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE</span>
+    </div>
+
+    <div class="hline" style="left:240px; top:708px; width:40px;"></div>
+    <div class="node" style="left:280px; top:682px;">
+      <span class="nname">[ joseph-nas ]</span>
+      <span class="nmeta">NODE 304 · ZFS 4×HDD</span>
+      <span class="nsvc">NFS EXPORTS ×4</span>
+      <span class="tstat"><span class="dot ok"></span> ONLINE · 68% USED</span>
+    </div>
+
+    <!-- floating window: node inspector -->
+    <div class="window" style="left:790px; top:120px; width:520px;">
+      <div class="titlebar">
+        <span class="tb-title">security-pve — node inspector</span>
+        <span class="tb-x">✕</span>
+      </div>
+      <div class="win-body">
+        <div class="kv"><span class="k">HARDWARE</span><span class="v">INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
+        <div class="kv"><span class="k">PLATFORM</span><span class="v">PROXMOX VE 8.4 · KERNEL 6.14</span></div>
+        <div class="gauge-row"><span class="k">CPU</span><div class="gauge"><div class="gfill" style="width:17%"></div></div><span class="gval">17%</span></div>
+        <div class="gauge-row"><span class="k">RAM</span><div class="gauge"><div class="gfill" style="width:71%"></div></div><span class="gval">71%</span></div>
+        <div class="svc-head">SERVICES</div>
+        <div class="svc"><span class="dot ok"></span> frigate <span class="svc-note">nixos ct 205 · 6 cameras</span></div>
+        <div class="svc"><span class="dot ok"></span> coral-tpu <span class="svc-note">inference 8.1ms</span></div>
+        <div class="win-foot">$ uptime → 13 days. do not jinx it.<span class="caret">▮</span></div>
+      </div>
+    </div>
+
+    <div class="hintbar">CLICK A NODE TO INSPECT&nbsp;&nbsp;·&nbsp;&nbsp;WINDOWS TILE&nbsp;&nbsp;·&nbsp;&nbsp;[SPACE] PALETTE&nbsp;&nbsp;·&nbsp;&nbsp;4:LOG IS THE WAY BACK TO THE CALM SITE</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

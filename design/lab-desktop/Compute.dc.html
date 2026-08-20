@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+  <style>
+    body { margin: 0; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .desktop {
+    width: 1440px;
+    height: 900px;
+    background: #121411;
+    font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #c9cec4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waybar {
+    height: 48px;
+    background: #191b18;
+    border-bottom: 1px solid #2e312b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+  }
+
+  .wb-left { font-weight: 700; color: #f2f0e9; }
+  .us { color: #a3b3a0; }
+  .wb-ws { display: flex; gap: 28px; }
+  .ws { color: #6d7268; padding: 4px 0; cursor: pointer; }
+  .ws:hover { color: #c9cec4; }
+  .ws.active { color: #f2f0e9; box-shadow: inset 0 -2px 0 #a3b3a0; }
+  .wb-right { color: #6d7268; display: flex; align-items: center; gap: 8px; }
+
+  .dot { display: inline-block; width: 7px; height: 7px; background: #a3b3a0; margin-right: 4px; }
+
+  .tiles {
+    position: absolute;
+    inset: 64px 28px 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .window {
+    background: #191b18;
+    border: 1px solid #2e312b;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.12s ease;
+  }
+
+  .window:hover { border-color: #3a3e36; }
+  .window.focused { border-color: #a3b3a0; box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.45); }
+
+  .titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #2e312b;
+    background: #1f221d;
+    cursor: grab;
+  }
+
+  .tb-title { font-size: 11px; letter-spacing: 0.14em; color: #f2f0e9; }
+  .tb-x { color: #6d7268; cursor: pointer; font-size: 12px; }
+  .tb-x:hover { color: #c98a7d; }
+
+  .win-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+
+  .kv { display: flex; gap: 16px; font-size: 11px; letter-spacing: 0.1em; }
+  .k { color: #6d7268; width: 42px; flex-shrink: 0; font-size: 10px; letter-spacing: 0.18em; padding-top: 1px; }
+  .v { color: #c9cec4; }
+
+  .gauge-row { display: flex; align-items: center; gap: 16px; }
+  .gauge { flex: 1; height: 12px; border: 1px solid #2e312b; padding: 2px; }
+  .gfill { height: 100%; background: repeating-linear-gradient(90deg, #a3b3a0 0 8px, #191b18 8px 10px); }
+  .gval { font-size: 11px; color: #c9cec4; width: 36px; text-align: right; }
+
+  .svc-head { font-size: 10px; letter-spacing: 0.22em; color: #6d7268; margin-top: 4px; }
+  .svc { font-size: 12px; color: #c9cec4; display: flex; align-items: center; gap: 6px; }
+  .svc-note { color: #6d7268; font-size: 10px; letter-spacing: 0.08em; margin-left: auto; }
+
+  .idle-msg { font-size: 12px; color: #6d7268; letter-spacing: 0.12em; line-height: 1.9; }
+
+  .caret { color: #a3b3a0; animation: blink 1.1s steps(1) infinite; margin-left: 4px; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .hintbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 28px;
+    border-top: 1px solid #2e312b;
+    background: #191b18;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4c5148;
+    text-align: center;
+  }
+  </style>
+</helmet>
+
+<div class="desktop">
+  <div class="waybar">
+    <div class="wb-left">PJ<span class="us">_</span>&nbsp;&nbsp;LAB</div>
+    <div class="wb-ws">
+      <span class="ws">1:NETWORK</span>
+      <span class="ws active">2:COMPUTE</span>
+      <span class="ws">3:STORAGE</span>
+      <span class="ws">4:LOG</span>
+    </div>
+    <div class="wb-right"><span class="dot ok"></span> JOSEPH-HOME · QUORATE&nbsp;&nbsp;&nbsp;40 CPU · 77G&nbsp;&nbsp;&nbsp;21:12</div>
+  </div>
+
+  <div class="tiles">
+    <div class="window focused">
+      <div class="titlebar"><span class="tb-title">ser5-proxmox</span><span class="tb-x">✕</span></div>
+      <div class="win-body">
+        <div class="kv"><span class="k">HW</span><span class="v">RYZEN 7 5850U · 16C · 27G</span></div>
+        <div class="gauge-row"><span class="k">CPU</span><div class="gauge"><div class="gfill" style="width:24%"></div></div><span class="gval">24%</span></div>
+        <div class="gauge-row"><span class="k">RAM</span><div class="gauge"><div class="gfill" style="width:63%"></div></div><span class="gval">63%</span></div>
+        <div class="svc-head">GUESTS</div>
+        <div class="svc"><span class="dot ok"></span> coolify <span class="svc-note">ships this very site</span></div>
+        <div class="svc"><span class="dot ok"></span> home-assistant <span class="svc-note">vm 108</span></div>
+        <div class="svc"><span class="dot ok"></span> adguard <span class="svc-note">dns for everything</span></div>
+        <div class="svc"><span class="dot ok"></span> excalidraw <span class="svc-note">vlan 60</span></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="titlebar"><span class="tb-title">pve-ser-24gb</span><span class="tb-x">✕</span></div>
+      <div class="win-body">
+        <div class="kv"><span class="k">HW</span><span class="v">RYZEN 7 6800U · 16C · 19G</span></div>
+        <div class="gauge-row"><span class="k">CPU</span><div class="gauge"><div class="gfill" style="width:31%"></div></div><span class="gval">31%</span></div>
+        <div class="gauge-row"><span class="k">RAM</span><div class="gauge"><div class="gfill" style="width:78%"></div></div><span class="gval">78%</span></div>
+        <div class="svc-head">GUESTS</div>
+        <div class="svc"><span class="dot ok"></span> katzenbase <span class="svc-note">the second brain</span></div>
+        <div class="svc"><span class="dot ok"></span> immich <span class="svc-note">nixos ct 206</span></div>
+        <div class="svc"><span class="dot ok"></span> mast · hermes <span class="svc-note">agents</span></div>
+        <div class="svc"><span class="dot ok"></span> github-runner <span class="svc-note">ci, nixos ct 207</span></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="titlebar"><span class="tb-title">security-pve</span><span class="tb-x">✕</span></div>
+      <div class="win-body">
+        <div class="kv"><span class="k">HW</span><span class="v">INTEL N150 · 4C · 15G · CORAL TPU</span></div>
+        <div class="gauge-row"><span class="k">CPU</span><div class="gauge"><div class="gfill" style="width:17%"></div></div><span class="gval">17%</span></div>
+        <div class="gauge-row"><span class="k">RAM</span><div class="gauge"><div class="gfill" style="width:71%"></div></div><span class="gval">71%</span></div>
+        <div class="svc-head">GUESTS</div>
+        <div class="svc"><span class="dot ok"></span> frigate <span class="svc-note">nixos ct 205 · 6 cameras</span></div>
+        <div class="svc"><span class="dot ok"></span> coral-tpu <span class="svc-note">8.1ms inference</span></div>
+      </div>
+    </div>
+
+    <div class="window idle">
+      <div class="titlebar"><span class="tb-title">s13-proxmox</span><span class="tb-x">✕</span></div>
+      <div class="win-body">
+        <div class="kv"><span class="k">HW</span><span class="v">INTEL N150 · 4C · 15G</span></div>
+        <div class="gauge-row"><span class="k">CPU</span><div class="gauge"><div class="gfill" style="width:2%"></div></div><span class="gval">2%</span></div>
+        <div class="gauge-row"><span class="k">RAM</span><div class="gauge"><div class="gfill" style="width:6%"></div></div><span class="gval">6%</span></div>
+        <div class="svc-head">GUESTS</div>
+        <div class="idle-msg">NONE.<br>IDLE // AWAITING PURPOSE<span class="caret">▮</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hintbar">SUPER+Q CLOSE&nbsp;&nbsp;·&nbsp;&nbsp;DRAG TITLEBAR TO FLOAT&nbsp;&nbsp;·&nbsp;&nbsp;FOCUSED WINDOW = SAGE BORDER</div>
+</div>
+</x-dc>
+</body>
+</html>

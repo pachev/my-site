@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+  <style>
+    body { margin: 0; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .desktop {
+    width: 1440px;
+    height: 900px;
+    background: #121411;
+    font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #c9cec4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waybar {
+    height: 48px;
+    background: #191b18;
+    border-bottom: 1px solid #2e312b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+  }
+
+  .wb-left { font-weight: 700; color: #f2f0e9; }
+  .us { color: #a3b3a0; }
+  .wb-ws { display: flex; gap: 28px; }
+  .ws { color: #6d7268; padding: 4px 0; cursor: pointer; }
+  .ws:hover { color: #c9cec4; }
+  .ws.active { color: #f2f0e9; box-shadow: inset 0 -2px 0 #a3b3a0; }
+  .wb-right { color: #6d7268; display: flex; align-items: center; gap: 8px; }
+
+  .dot { display: inline-block; width: 7px; height: 7px; background: #a3b3a0; margin-right: 4px; }
+
+  .term {
+    position: absolute;
+    inset: 88px 120px 96px;
+    border: 1px solid #2e312b;
+    background: #191b18;
+    padding: 36px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.45);
+  }
+
+  .prompt {
+    font-size: 14px;
+    color: #a3b3a0;
+    letter-spacing: 0.04em;
+    margin-bottom: 26px;
+  }
+
+  .entry {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    padding: 13px 14px;
+    margin: 0 -14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.1s ease;
+  }
+
+  .entry:hover { background: #1f221d; }
+  .entry:hover .eread { opacity: 1; }
+
+  .edate {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: #6d7268;
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .emsg { font-size: 14px; color: #c9cec4; letter-spacing: 0.02em; }
+  .entry:hover .emsg { color: #f2f0e9; }
+  .entry.warn .emsg { color: #d4b483; }
+
+  .eread {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #a3b3a0;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    flex-shrink: 0;
+  }
+
+  .cursor-line { margin-top: 26px; font-size: 14px; color: #a3b3a0; }
+  .caret { animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .hintbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 28px;
+    border-top: 1px solid #2e312b;
+    background: #191b18;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4c5148;
+    text-align: center;
+  }
+  </style>
+</helmet>
+
+<div class="desktop">
+  <div class="waybar">
+    <div class="wb-left">PJ<span class="us">_</span>&nbsp;&nbsp;LAB</div>
+    <div class="wb-ws">
+      <span class="ws">1:NETWORK</span>
+      <span class="ws">2:COMPUTE</span>
+      <span class="ws">3:STORAGE</span>
+      <span class="ws active">4:LOG</span>
+    </div>
+    <div class="wb-right"><span class="dot ok"></span> FOLLOWING&nbsp;&nbsp;&nbsp;21:12</div>
+  </div>
+
+  <div class="term">
+    <div class="prompt">$ journalctl -u pj-lab --since 2025 -f</div>
+
+    <a class="entry">
+      <span class="edate">AUG 11 2026</span>
+      <span class="emsg">Replaced Debian LXCs with NixOS containers: frigate, immich, github-runner</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry">
+      <span class="edate">AUG 11 2026</span>
+      <span class="emsg">Deployed telegraf on every node, pointed at VictoriaMetrics. The lab has vitals now</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry">
+      <span class="edate">AUG 10 2026</span>
+      <span class="emsg">Destroyed palworld server. No survivors</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry">
+      <span class="edate">AUG 06 2026</span>
+      <span class="emsg">Migrated all NFS mounts from raw IPs to DNS names, then rebooted the whole cluster</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry warn">
+      <span class="edate">AUG 06 2026</span>
+      <span class="emsg">ser-24gb took five power cycles to come back. Nothing was wrong. Hardware is haunted</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry">
+      <span class="edate">JUL 2026</span>
+      <span class="emsg">Replaced the stock ATT gateway with a full UniFi stack. The BGW210 lives on in bridge-mode purgatory</span>
+      <span class="eread">READ →</span>
+    </a>
+    <a class="entry">
+      <span class="edate">MAR 2025</span>
+      <span class="emsg">Racked everything into a 15U open frame. It has a patch panel now. This is a real lab</span>
+      <span class="eread">READ →</span>
+    </a>
+
+    <div class="cursor-line">$ <span class="caret">▮</span></div>
+  </div>
+
+  <div class="hintbar">EACH ENTRY OPENS AS A REGULAR ARTICLE — LIGHT, READABLE, THE CALM SITE AGAIN.</div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "artboards": [
+    { "file": "Boot.dc.html", "x": 0, "y": 0, "w": 1440, "h": 900, "title": "01 — Boot Sequence" },
+    { "file": "Main.dc.html", "x": 1540, "y": 0, "w": 1440, "h": 900, "title": "02 — Desktop / 1:NETWORK" },
+    { "file": "Compute.dc.html", "x": 3080, "y": 0, "w": 1440, "h": 900, "title": "03 — 2:COMPUTE (tiled)" },
+    { "file": "Storage.dc.html", "x": 1540, "y": 1050, "w": 1440, "h": 900, "title": "04 — 3:STORAGE (the core)" },
+    { "file": "Journal.dc.html", "x": 3080, "y": 1050, "w": 1440, "h": 900, "title": "05 — 4:LOG (journalctl)" }
+  ],
+  "annotations": [
+    { "id": "flow", "x": 0, "y": -300, "w": 480, "text": "LAB DESKTOP ENVIRONMENT\nThe arc: calm sage site → click LAB → boot (skippable, sessionStorage, reduced-motion safe) → full-viewport dark desktop → 4:LOG entries open as normal light articles.\nA fake tiling window manager on one route. Everything else on the site stays calm." },
+    { "id": "tokens", "x": 0, "y": 1050, "w": 480, "text": "TOKENS (derived from home terminal card)\nroom #121411 · surface #191b18 · raised #1f221d\nborder #2e312b · border-bright #3a3e36\ntext #c9cec4 · bright #f2f0e9 · muted #6d7268 · dim #4c5148\nsage #a3b3a0 · accent #829280 · warn #d4b483 · err #c98a7d\nboot bg #0d0f0c · shadow 10px 10px 0 rgba(0,0,0,.45)\nJetBrains Mono Nerd Font everywhere · no border-radius\nwaybar 48px · micro-labels 9-12px ls 0.14-0.26em" },
+    { "id": "data", "x": 4620, "y": 0, "w": 460, "text": "DATA RULES\nInventory is real (katzenbase HomeLab project): 4 PVE nodes + NAS, real hardware, real services, real journal events.\nIPs / VLAN ids / SSIDs deliberately REDACTED from the public page.\nTelemetry numbers are plausible fakes seeded at build, wiggled client-side. Optional later: real numbers via static JSON from VictoriaMetrics on cron." },
+    { "id": "phases", "x": 4620, "y": 1050, "w": 460, "text": "BUILD PHASES (tickets)\nP1: boot overlay + waybar + 4 workspaces + static scenes + journalctl log wired to lab collection.\nP2: clickable nodes → floating/tiling windows, drag, focus, SUPER+Q.\nP3: easter eggs — [space] command palette, neofetch, sudo rm -rf / → \"nice try.\", nixos-rebuild switch → theme swap (GRUVBOX / TOKYO NIGHT / NERV), konami code.\nMotion stack (PJ's call): GSAP for the cinematic beats (boot, workspace transitions, window open/tile), plain CSS/SVG transitions for micro-interactions.\nNon-negotiables: prefers-reduced-motion, noscript fallback = plain list, articles stay normal Astro pages." }
+  ],
+  "launch": { "view": "canvas" }
+}
