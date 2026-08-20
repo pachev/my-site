@@ -1,9 +1,4 @@
 ---
-interface Props {
-  wide?: boolean;
-}
-const { wide = false } = Astro.props;
-
 const navLinks = [
   { href: '/', label: 'HOME' },
   { href: '/posts', label: 'POSTS' },
@@ -17,7 +12,7 @@ const isActive = (href: string) =>
 ---
 
 <header>
-  <div class:list={["header-container", { wide }]}>
+  <div class="header-container">
     <a href="/" class="logotype">PJ<span class="underscore">_</span></a>
     <nav>
       <ul class="nav-links">
@@ -47,10 +42,6 @@ const isActive = (href: string) =>
     position: sticky;
     top: 0;
     z-index: 100;
-  }
-
-  .header-container.wide {
-    max-width: 1720px;
   }
 
   .header-container {

@@ -6,13 +6,11 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
-  wide?: boolean;
 }
 
 const {
   title = "Pachev Joseph - Software Engineer",
-  description = "Tech Guy, and Soccer Enthusiast",
-  wide = false
+  description = "Tech Guy, and Soccer Enthusiast"
 } = Astro.props;
 ---
 
@@ -31,11 +29,11 @@ const {
   </head>
   <body>
     <div class="site-container">
-      <Header wide={wide} />
-      <main class:list={{ 'main-wide': wide }}>
+      <Header />
+      <main>
         <slot />
       </main>
-      <Footer wide={wide} />
+      <Footer />
     </div>
   </body>
 </html>

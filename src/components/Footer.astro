@@ -1,16 +1,11 @@
 ---
 import SocialIcons from './SocialIcons.astro';
 
-interface Props {
-  wide?: boolean;
-}
-const { wide = false } = Astro.props;
-
 const currentYear = new Date().getFullYear();
 ---
 
 <footer>
-  <div class:list={["footer-container", { wide }]}>
+  <div class="footer-container">
     <p>Copyright &copy; {currentYear} Pachev Joseph</p>
     <SocialIcons />
   </div>
@@ -22,10 +17,6 @@ const currentYear = new Date().getFullYear();
     padding: var(--space-md) 0;
     margin-top: auto;
     border-top: 1px solid var(--color-border);
-  }
-
-  .footer-container.wide {
-    max-width: 1720px;
   }
 
   .footer-container {
