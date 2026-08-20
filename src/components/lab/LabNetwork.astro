@@ -1,5 +1,5 @@
 ---
-// Workspace 1: network topology. Static in phase 1 (node clicks arrive in phase 2).
+// Workspace 1: network topology with phase 2 node inspector launchers.
 const nodes = [
   { id: 'security-pve', name: '[ security-pve ]', meta: 'N150 · CORAL TPU', svc: 'FRIGATE', status: 'ONLINE', idle: false },
   { id: 'ser5-proxmox', name: '[ ser5-proxmox ]', meta: 'RYZEN 7 5850U · 27G', svc: 'COOLIFY · HOME ASSISTANT', status: 'ONLINE', idle: false },
@@ -41,7 +41,13 @@ const nodes = [
 
     <div class="lab-node-rail">
       {nodes.map((node) => (
-        <div class:list={['lab-node', { 'lab-node-idle': node.idle, 'lab-node-selected': node.id === 'security-pve' }]} data-node={node.id}>
+        <button
+          type="button"
+          class:list={['lab-node', { 'lab-node-idle': node.idle, 'lab-node-selected': node.id === 'security-pve' }]}
+          data-open-node={node.id}
+          aria-label={`Open ${node.id} inspector`}
+          aria-pressed={node.id === 'security-pve' ? 'true' : 'false'}
+        >
           <span class="lab-nname">{node.name}</span>
           <span class="lab-nmeta">{node.meta}</span>
           <span class="lab-nsvc">
@@ -49,31 +55,57 @@ const nodes = [
             {node.idle && <span class="lab-caret">▮</span>}
           </span>
           <span class="lab-tstat"><span class="lab-dot"></span> {node.status}</span>
-        </div>
+        </button>
       ))}
     </div>
 
-    <div class="lab-window lab-inspector">
-      <div class="lab-titlebar">
-        <span class="lab-tb-title" id="lab-insp-title">security-pve — node inspector</span>
-        <span class="lab-tb-x">✕</span>
-      </div>
-      <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" id="lab-insp-hw">INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
-        <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" id="lab-insp-platform">PROXMOX VE 8.4 · KERNEL 6.14</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" id="lab-insp-cpu-fill" style="width:34%"></div></div><span class="lab-gval" id="lab-insp-cpu-val">34%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" id="lab-insp-ram-fill" style="width:31%"></div></div><span class="lab-gval" id="lab-insp-ram-val">31%</span></div>
-        <div class="lab-svc-head">SERVICES</div>
-        <div id="lab-insp-svcs">
-          <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
-          <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
+    <div class="lab-window-layer lab-network-windows" data-window-layer>
+      <div
+        class="lab-window lab-inspector lab-window-focused"
+        data-managed-window
+        data-window-id="network-security-pve"
+        data-window-mode="floating"
+        data-node="security-pve"
+      >
+        <div class="lab-titlebar">
+          <span class="lab-tb-title" data-window-title>security-pve — node inspector</span>
+          <button type="button" class="lab-tb-x" data-window-close aria-label="Close security-pve inspector">✕</button>
         </div>
-        <div class="lab-win-foot" id="lab-insp-foot">$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
+        <div class="lab-win-body">
+          <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" data-inspector-hw>INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
+          <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" data-inspector-platform>PROXMOX VE 8.4 · KERNEL 6.14</span></div>
+          <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:34%"></div></div><span class="lab-gval" data-gauge-value="cpu">34%</span></div>
+          <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:31%"></div></div><span class="lab-gval" data-gauge-value="ram">31%</span></div>
+          <div class="lab-svc-head">SERVICES</div>
+          <div data-inspector-services>
+            <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
+            <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
+          </div>
+          <div class="lab-win-foot" data-inspector-foot>$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="lab-hintbar">CLICK A NODE TO INSPECT&nbsp;&nbsp;&middot;&nbsp;&nbsp;KEYS 1&ndash;4 SWITCH WORKSPACES&nbsp;&nbsp;&middot;&nbsp;&nbsp;THE TUNNEL IS THE ONLY WAY IN</div>
+  <template id="lab-node-inspector-template">
+    <div class="lab-window lab-inspector" data-managed-window data-window-mode="tiled" hidden>
+      <div class="lab-titlebar">
+        <span class="lab-tb-title" data-window-title>node inspector</span>
+        <button type="button" class="lab-tb-x" data-window-close aria-label="Close node inspector">✕</button>
+      </div>
+      <div class="lab-win-body">
+        <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" data-inspector-hw></span></div>
+        <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" data-inspector-platform></span></div>
+        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu"></div></div><span class="lab-gval" data-gauge-value="cpu"></span></div>
+        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram"></div></div><span class="lab-gval" data-gauge-value="ram"></span></div>
+        <div class="lab-svc-head">SERVICES</div>
+        <div data-inspector-services></div>
+        <div class="lab-win-foot" data-inspector-foot></div>
+      </div>
+    </div>
+  </template>
+
+  <div class="lab-hintbar">CLICK A NODE TO OPEN&nbsp;&nbsp;&middot;&nbsp;&nbsp;DRAG TITLEBAR TO FLOAT&nbsp;&nbsp;&middot;&nbsp;&nbsp;DOUBLE-CLICK TO TILE</div>
 </section>
 
 <style>
@@ -191,6 +223,10 @@ const nodes = [
     grid-template-columns: 1fr auto;
     gap: 2px 12px;
     cursor: pointer;
+    width: 100%;
+    color: inherit;
+    font: inherit;
+    text-align: left;
   }
 
   .lab-node::before {
@@ -249,11 +285,28 @@ const nodes = [
     color: var(--lab-muted);
   }
 
-  .lab-inspector {
+  .lab-network-windows {
     position: absolute;
-    left: 790px;
-    top: 110px;
-    width: 520px;
+    left: 640px;
+    right: 32px;
+    top: 82px;
+    bottom: 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 14px;
+    align-content: start;
+    pointer-events: none;
+  }
+
+  .lab-network-windows .lab-window {
+    pointer-events: auto;
+    min-width: 0;
+  }
+
+  .lab-network-windows [data-window-mode='floating'] {
+    top: 28px;
+    right: 0;
+    width: min(520px, 100%);
   }
 
   @media (max-width: 900px) {
@@ -267,10 +320,12 @@ const nodes = [
 
     .lab-tbox,
     .lab-node-rail,
-    .lab-inspector {
+    .lab-network-windows {
       position: static;
       width: 100%;
       max-width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
     }
 
     .lab-tbox-tunnel {
