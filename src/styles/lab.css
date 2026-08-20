@@ -137,27 +137,31 @@
   display: block;
 }
 
-/* Entrance runs as a keyframe animation, not a transition: transitions
-   started in the same frame as a display flip fire inconsistently. */
-@media (prefers-reduced-motion: no-preference) {
-  .lab-scene.active {
-    animation: lab-scene-in 200ms ease;
-  }
-}
-
-@keyframes lab-scene-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-
 /* ---------- Shared window chrome ---------- */
 
 .lab-window {
   background: var(--lab-surface);
   border: 1px solid var(--lab-border-bright);
   box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.45);
+}
+
+.lab-window[hidden] {
+  display: none;
+}
+
+.lab-window-layer {
+  position: relative;
+}
+
+.lab-window[data-window-mode='floating'] {
+  position: absolute;
+  max-width: 100%;
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.45);
+}
+
+.lab-window-focused {
+  border-color: var(--lab-sage) !important;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.45) !important;
 }
 
 .lab-titlebar {
@@ -167,6 +171,13 @@
   padding: 10px 14px;
   border-bottom: 1px solid var(--lab-border);
   background: var(--lab-raised);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.lab-titlebar:active {
+  cursor: grabbing;
 }
 
 .lab-tb-title {
@@ -179,6 +190,11 @@
   color: var(--lab-muted);
   cursor: pointer;
   font-size: 12px;
+  font-family: inherit;
+  line-height: 1;
+  border: 0;
+  background: transparent;
+  padding: 3px;
 }
 
 .lab-tb-x:hover {
