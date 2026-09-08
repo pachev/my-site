@@ -35,3 +35,14 @@ Quick notes and things I've learned along the way. Shorter than blog posts, focu
 - **Tag filtering**: Filter TIL entries by tags to find specific topics
 - **Responsive design**: Works on mobile, tablet, and desktop
 - **Markdown support**: Write content in markdown format
+
+### Lab inventory
+
+`/lab` presents the homelab as an interactive desktop. Keep node summaries in
+`src/components/lab/LabNetwork.astro`, compute panels in `LabCompute.astro`,
+and the node inspector data in `src/scripts/labWindowManager.ts` consistent. Dated
+deployment notes belong in `LabLog.astro`.
+
+The S13 hosts Jellyfin in NixOS LXC 212, with Intel GPU transcoding and
+read-only NAS media mounts. CPU and RAM gauges are illustrative values,
+not live telemetry.

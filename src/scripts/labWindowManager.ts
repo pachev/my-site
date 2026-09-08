@@ -39,8 +39,8 @@ const NODE_DATA: Record<string, NodeInfo> = {
     platform: 'PROXMOX VE 8.4 · KERNEL 6.14',
     cpu: 2,
     ram: 13,
-    svcs: [],
-    foot: '$ uptime → 9 days. doing nothing, flawlessly.',
+    svcs: [['jellyfin', 'nixos ct 212 · movies + tv'], ['intel-gpu', 'hardware transcoding'], ['nas-library', 'read-only media · local ssd cache']],
+    foot: '$ now playing → the spare node has a job.',
   },
   'joseph-nas': {
     hw: 'RYZEN 5 · NODE 304 · 16G · ZFS 4×HDD',
