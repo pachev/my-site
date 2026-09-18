@@ -27,3 +27,10 @@ This is a personal portfolio website built with Astro. It uses TypeScript and MD
 - **Error Handling:** Use standard JavaScript/TypeScript error handling (try/catch).
 - **Components:** Astro components (`.astro`) are used for UI structure and layout.
 - **Styles:** CSS modules or global styles can be used. Check for any existing styles in the project.
+
+## Docs
+
+`docs/` follows Diataxis (how-to, reference, explanation, tutorials). Read
+`docs/how-to/draft-a-post-with-ai.md` before touching blog or TIL content.
+Update the affected doc in the same commit when a change alters documented
+behavior.

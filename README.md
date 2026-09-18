@@ -46,3 +46,8 @@ deployment notes belong in `LabLog.astro`.
 The S13 hosts Jellyfin in NixOS LXC 212, with Intel GPU transcoding and
 read-only NAS media mounts. CPU and RAM gauges are illustrative values,
 not live telemetry.
+
+## Docs
+
+Working docs live in [`docs/`](docs/README.md) (Diataxis layout). Start with
+[Draft a post with AI help](docs/how-to/draft-a-post-with-ai.md).
