@@ -159,6 +159,80 @@ test('htop is a static demo, sorts independently, supports history and clear', a
   await expect(page.locator('#lab-desktop')).toHaveAttribute('data-lab-theme', 'gruvbox');
 });
 
+for (const width of [400, 1180]) {
+  test(`terminal input edits inline and keeps keyboard focus cues at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 820 });
+    await enterLab(page);
+    const launcher = page.getByRole('button', { name: 'Open lab command palette' });
+    await launcher.click();
+    const input = page.getByRole('textbox', { name: 'Lab command' });
+    const prompt = page.locator('.lab-shell-prompt');
+    const output = page.locator('[data-shell-output]');
+    const selection = () => input.evaluate((el) => {
+      const field = el as HTMLInputElement;
+      return [field.selectionStart, field.selectionEnd];
+    });
+    await expect(input).toBeFocused();
+    await expect(input).toHaveCSS('outline-style', 'none');
+    expect(await input.evaluate((el) => getComputedStyle(el).caretColor)).not.toMatch(/transparent|rgba\(.*?, 0\)/);
+    await expect(prompt).toHaveCSS('text-decoration-line', 'underline');
+    await expect(page.locator('.lab-shell-caret')).toHaveCount(0);
+    await page.keyboard.type('help');
+    await input.press('ArrowLeft');
+    await input.press('ArrowLeft');
+    expect(await selection()).toEqual([2, 2]);
+    await page.keyboard.type('l');
+    await expect(input).toHaveValue('hellp');
+    await input.press('Backspace');
+    await expect(input).toHaveValue('help');
+    await input.press('Shift+ArrowRight');
+    await input.press('Shift+ArrowRight');
+    expect(await selection()).toEqual([2, 4]);
+    await page.keyboard.type('lp');
+    await expect(input).toHaveValue('help');
+    await input.press('Enter');
+    await expect(output).toContainText('COMMANDS');
+    await command(page, 'fastfetch');
+    const longCommand = 'x'.repeat(512);
+    await input.fill(longCommand);
+    await input.press('ArrowLeft');
+    await input.press('Backspace');
+    expect(await selection()).toEqual([510, 510]);
+    await page.keyboard.type('x');
+    await expect(input).toHaveValue(longCommand);
+    expect(await input.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+    await input.press('Enter');
+    await expect(output).toContainText(`command not found: ${longCommand}`);
+    expect(await page.locator('#lab-shell').evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    await input.press('ArrowUp');
+    await expect(input).toHaveValue(longCommand);
+    await input.press('ArrowUp');
+    await expect(input).toHaveValue('fastfetch');
+    await input.press('ArrowDown');
+    await expect(input).toHaveValue(longCommand);
+    await input.press('ArrowDown');
+    await expect(input).toBeEmpty();
+    expect(await selection()).toEqual([0, 0]);
+    await command(page, 'clear');
+    await input.press('Enter');
+    await expect(output).toBeEmpty();
+    await input.press('Tab');
+    const close = page.getByRole('button', { name: 'Close command palette', exact: true }).last();
+    await expect(close).toBeFocused();
+    await expect(close).toHaveCSS('outline-style', 'solid');
+    await expect(prompt).toHaveCSS('text-decoration-line', 'none');
+    await page.keyboard.press('Shift+Tab');
+    await expect(input).toBeFocused();
+    await expect(prompt).toHaveCSS('text-decoration-line', 'underline');
+    await page.keyboard.press('Escape');
+    await expect(launcher).toBeFocused();
+    await launcher.click();
+    await expect(input).toBeFocused();
+    await expect(input).toBeEmpty();
+    expect(await selection()).toEqual([0, 0]);
+  });
+}
+
 test('animated shell repeated close and reopen remains visible; Konami preserved', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await enterLab(page);

@@ -13,6 +13,9 @@ Konami sequence and inspector drag/tiling remain local browser interactions.
 - Inspectors support pointer dragging, double-click tiling and Super+Q closing.
 - Shell commands include help, fastfetch/neofetch, htop, clear and the existing
   joke/rebuild commands. Up/Down browse command history.
+- The shell input blends into the prompt. Its native caret follows the editing
+  position and selection; an underlined prompt indicates input focus. Other
+  keyboard controls retain their focus outline.
 
 ## Inventory and resource readings
 
