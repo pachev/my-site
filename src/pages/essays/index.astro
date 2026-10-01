@@ -10,7 +10,7 @@ const allPosts = await getCollection('essays', ({ data }) => {
 // Sort posts by date (newest first)
 const posts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const formatDate = (date) => {
+const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
