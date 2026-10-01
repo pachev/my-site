@@ -1,12 +1,11 @@
 ---
 // Workspace 1: network topology with phase 2 node inspector launchers.
-const nodes = [
-  { id: 'security-pve', name: '[ security-pve ]', meta: 'N150 · CORAL TPU', svc: 'FRIGATE', status: 'ONLINE', idle: false },
-  { id: 'ser5-proxmox', name: '[ ser5-proxmox ]', meta: 'RYZEN 7 5850U · 27G', svc: 'COOLIFY · HOME ASSISTANT', status: 'ONLINE', idle: false },
-  { id: 'pve-ser-24gb', name: '[ pve-ser-24gb ]', meta: 'RYZEN 7 6800U · 19G', svc: 'KATZENBASE · IMMICH · CI', status: 'ONLINE', idle: false },
-  { id: 's13-proxmox', name: '[ s13-proxmox ]', meta: 'N150 · INTEL GPU', svc: 'JELLYFIN · MOVIES + TV', status: 'ONLINE', idle: false },
-  { id: 'joseph-nas', name: '[ joseph-nas ]', meta: 'NODE 304 · ZFS 4×HDD', svc: 'NFS EXPORTS ×4', status: 'ONLINE · 58% USED', idle: false },
-];
+import { NODE_DATA, SNAPSHOT_LABEL } from '../../data/labSnapshot';
+const nodes = ['security-pve', 'ser5-proxmox', 'pve-ser-24gb', 's13-proxmox', 'joseph-nas'].map((id) => ({
+  id, name: `[ ${id} ]`, meta: ({ 'security-pve': 'N150 · CORAL TPU', 'ser5-proxmox': '5850U · 8C / 16T', 'pve-ser-24gb': '6800U · 8C / 16T', 's13-proxmox': 'N150 · INTEL GPU', 'joseph-nas': 'ZFS · 2×4 TB MIRROR' } as Record<string, string>)[id], svc: NODE_DATA[id].summary,
+  status: id === 'joseph-nas' ? 'ZFS · 61% ALLOCATED' : 'ONLINE · OCT 01', idle: false,
+}));
+const initialNode = NODE_DATA['security-pve'];
 ---
 
 <section class="lab-scene lab-network active" data-scene="1" role="tabpanel" aria-label="Network topology">
@@ -20,21 +19,21 @@ const nodes = [
     <div class="lab-tbox lab-tbox-gw">
       <span class="lab-tlabel">GATEWAY</span>
       <span class="lab-tname">UCG FIBER</span>
-      <span class="lab-tstat"><span class="lab-dot"></span> ONLINE · 10G WAN</span>
+      <span class="lab-tstat"><span class="lab-dot"></span> PORT 5 LINK · 10 Gbps</span>
     </div>
     <div class="lab-vline lab-vline-2"></div>
 
     <div class="lab-tbox lab-tbox-sw">
-      <span class="lab-tlabel">SWITCH</span>
-      <span class="lab-tname">USW-LITE-16-POE</span>
-      <span class="lab-tstat"><span class="lab-dot"></span> ONLINE · 48 CLIENTS</span>
+      <span class="lab-tlabel" title="Snapshot: Network app 10.6.106; gateway firmware 5.1.33; eight enabled networks/VLANs">UNIFI SITE · 6 DEVICES / 8 NETWORKS</span>
+      <span class="lab-tname">2 SWITCHES · 3 APs</span>
+      <span class="lab-tstat"><span class="lab-dot"></span> 49 CLIENTS · 31 WIRED / 18 WIFI</span>
     </div>
 
     <div class="lab-hline lab-hline-dashed"></div>
     <div class="lab-tbox lab-tbox-tunnel">
       <span class="lab-tlabel">INGRESS</span>
       <span class="lab-tname">CLOUDFLARE TUNNEL</span>
-      <span class="lab-tstat">ONLY WAY IN ⇄</span>
+      <span class="lab-tstat" title="Atuin · Coolify · Katzenbase · PocketID, October 1 snapshot">4 TUNNELS · SNAPSHOT</span>
     </div>
 
     <div class="lab-vline lab-vline-rail"></div>
@@ -72,16 +71,16 @@ const nodes = [
           <button type="button" class="lab-tb-x" data-window-close aria-label="Close security-pve inspector">✕</button>
         </div>
         <div class="lab-win-body">
-          <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" data-inspector-hw>INTEL N150 · 4C · 15G · CORAL TPU (USB)</span></div>
-          <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" data-inspector-platform>PROXMOX VE 8.4 · KERNEL 6.14</span></div>
-          <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:34%"></div></div><span class="lab-gval" data-gauge-value="cpu">34%</span></div>
-          <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:31%"></div></div><span class="lab-gval" data-gauge-value="ram">31%</span></div>
+          <div class="lab-kv"><span class="lab-k">HARDWARE</span><span class="lab-v" data-inspector-hw>{initialNode.hw}</span></div>
+          <div class="lab-kv"><span class="lab-k">PLATFORM</span><span class="lab-v" data-inspector-platform>{initialNode.platform}</span></div>
+          <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style={`width:${initialNode.cpu}%`}></div></div><span class="lab-gval" data-gauge-value="cpu">{initialNode.cpu}%</span></div>
+          <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style={`width:${initialNode.ram}%`}></div></div><span class="lab-gval" data-gauge-value="ram">{initialNode.ram}%</span></div>
           <div class="lab-svc-head">SERVICES</div>
+          <div class="lab-snapshot-label">{SNAPSHOT_LABEL}</div>
           <div data-inspector-services>
-            <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
-            <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">inference 8.1ms</span></div>
+            {initialNode.svcs.map(([name, note]) => <div class="lab-svc"><span class="lab-dot"></span> {name} <span class="lab-svc-note">{note}</span></div>)}
           </div>
-          <div class="lab-win-foot" data-inspector-foot>$ uptime → 13 days. do not jinx it.<span class="lab-caret">▮</span></div>
+          <div class="lab-win-foot" data-inspector-foot>{initialNode.foot}<span class="lab-caret">▮</span></div>
         </div>
       </div>
     </div>
@@ -99,20 +98,20 @@ const nodes = [
         <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu"></div></div><span class="lab-gval" data-gauge-value="cpu"></span></div>
         <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram"></div></div><span class="lab-gval" data-gauge-value="ram"></span></div>
         <div class="lab-svc-head">SERVICES</div>
+        <div class="lab-snapshot-label">{SNAPSHOT_LABEL}</div>
         <div data-inspector-services></div>
         <div class="lab-win-foot" data-inspector-foot></div>
       </div>
     </div>
   </template>
 
-  <div class="lab-hintbar">CLICK A NODE TO OPEN&nbsp;&nbsp;&middot;&nbsp;&nbsp;DRAG TITLEBAR TO FLOAT&nbsp;&nbsp;&middot;&nbsp;&nbsp;DOUBLE-CLICK TO TILE</div>
+  <div class="lab-hintbar">SNAPSHOT OCT 01 · ISP SPEED NOT MEASURED&nbsp;&nbsp;&middot;&nbsp;&nbsp;DRAG TITLEBAR TO FLOAT&nbsp;&nbsp;&middot;&nbsp;&nbsp;DOUBLE-CLICK TO TILE · <button type="button" class="lab-shell-launcher" data-trace-open aria-controls="lab-trace" aria-haspopup="dialog">Trace this page →</button></div>
 </section>
 
 <style>
   .lab-net-topo {
     position: relative;
-    /* 760px fits the absolute topology; the max() keeps this scene as tall
-       as the others so the hintbar never jumps between workspaces. */
+    /* The rail stays in flow, reserving space for every node above the hintbar. */
     min-height: max(760px, calc(100% - 40px));
     padding: 0 0 56px;
   }
@@ -205,9 +204,9 @@ const nodes = [
   }
 
   .lab-node-rail {
-    position: absolute;
-    left: 280px;
-    top: 300px;
+    position: relative;
+    margin-left: 280px;
+    padding-top: 300px;
     width: 320px;
     display: flex;
     flex-direction: column;
@@ -338,6 +337,8 @@ const nodes = [
     }
 
     .lab-node-rail {
+      margin-left: 0;
+      padding-top: 0;
       gap: 12px;
     }
 

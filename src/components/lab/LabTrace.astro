@@ -1,0 +1,94 @@
+---
+const stages = [
+  { title: 'Your browser', status: 'Illustrative request', detail: 'Imagine requesting /lab at pachevjoseph.com. This walkthrough explains the route; it does not send a probe or measure latency.' },
+  { title: 'Cloudflare edge', status: 'Documented ingress · settings unknown', detail: 'The Lab topology identifies Cloudflare Tunnel as ingress. An edge receives the public request. Cache behavior, DNS settings and TLS policy are not recorded in this repository, so a cache hit or miss cannot be claimed.' },
+  { title: 'Cloudflare Tunnel', status: 'Documented route · connector unknown', detail: 'The topology places a tunnel between the public edge and the homelab. Its connector location and origin routing rules are not checked in. This stage represents that link, not a verified connection.' },
+  { title: 'Coolify on the SER5', status: 'Documented host · runtime unknown', detail: 'The compute inventory lists Coolify on ser5-proxmox as shipping this site. Publishing notes say a push to main triggers redeployment. The origin server, container mapping and reverse-proxy configuration are not available here.' },
+  { title: 'Astro → this page', status: 'Verified build configuration', detail: 'astro.config.mjs uses Astro’s default static output and MDX. The build emits HTML, styles and scripts; your browser runs the Lab interactions locally. Coolify deploys those build artifacts, but this repo does not specify how they are served.' },
+];
+---
+<dialog class="lab-shell lab-trace" id="lab-trace" aria-labelledby="lab-trace-title" hidden>
+  <button type="button" class="lab-shell-backdrop" data-trace-close tabindex="-1" aria-label="Close trace"></button>
+  <div class="lab-window lab-trace-window">
+    <div class="lab-titlebar">
+      <span class="lab-tb-title" id="lab-trace-title">Trace this page</span>
+      <button type="button" class="lab-tb-x" data-trace-close autofocus aria-label="Close trace">✕</button>
+    </div>
+    <div class="lab-trace-body" tabindex="0" aria-label="Trace walkthrough">
+      <p class="lab-trace-note">ARCHITECTURE WALKTHROUGH · NO LIVE TRACE</p>
+      <p>Follow a request from your browser to the Lab. The path is explanatory; no timings or live infrastructure checks are collected.</p>
+      <ol class="lab-trace-route" aria-label="Request stages">
+        {stages.map((stage, i) => (
+          <li><button type="button" data-trace-step={i} aria-current={i === 0 ? 'step' : undefined}>{i + 1}. {stage.title}</button></li>
+        ))}
+      </ol>
+      <div class="lab-trace-detail" aria-live="polite" aria-atomic="true">
+        {stages.map((stage, i) => (
+          <section data-trace-panel={i} hidden={i !== 0}>
+            <p class="lab-trace-note">{stage.status}</p>
+            <h2>{stage.title}</h2>
+            <p>{stage.detail}</p>
+          </section>
+        ))}
+      </div>
+      <div class="lab-trace-controls">
+        <button type="button" data-trace-prev disabled>← Back</button>
+        <span data-trace-count>1 / {stages.length}</span>
+        <button type="button" data-trace-next>Next →</button>
+      </div>
+      <p class="lab-trace-source">Based on the Lab network and compute inventory, publishing notes and Astro configuration. Deployment settings remain unverified.</p>
+    </div>
+  </div>
+</dialog>
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#lab-trace');
+  const launcher = document.querySelector<HTMLButtonElement>('[data-trace-open]');
+  if (dialog && launcher) {
+    const steps = Array.from(dialog.querySelectorAll<HTMLButtonElement>('[data-trace-step]'));
+    const panels = Array.from(dialog.querySelectorAll<HTMLElement>('[data-trace-panel]'));
+    const prev = dialog.querySelector<HTMLButtonElement>('[data-trace-prev]')!;
+    const next = dialog.querySelector<HTMLButtonElement>('[data-trace-next]')!;
+    const count = dialog.querySelector<HTMLElement>('[data-trace-count]')!;
+    let current = 0;
+    function select(index: number) {
+      current = index;
+      steps.forEach((step, i) => {
+        if (i === index) step.setAttribute('aria-current', 'step');
+        else step.removeAttribute('aria-current');
+      });
+      panels.forEach((panel, i) => { panel.hidden = i !== index; });
+      prev.disabled = index === 0;
+      count.textContent = `${index + 1} / ${steps.length}`;
+      next.textContent = index === steps.length - 1 ? 'Restart ↺' : 'Next →';
+    }
+    function close() { dialog!.close(); dialog!.hidden = true; }
+    launcher.addEventListener('click', () => {
+      select(0);
+      dialog.hidden = false;
+      dialog.showModal();
+    });
+    dialog.addEventListener('cancel', (event) => { event.preventDefault(); close(); });
+    dialog.querySelectorAll('[data-trace-close]').forEach((button) => button.addEventListener('click', close));
+    steps.forEach((step, i) => step.addEventListener('click', () => select(i)));
+    prev.addEventListener('click', () => select(Math.max(0, current - 1)));
+    next.addEventListener('click', () => select((current + 1) % steps.length));
+  }
+</script>
+<style>
+  .lab-trace-window { position: relative; width: min(820px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); display: flex; flex-direction: column; }
+  .lab-trace-body { padding: 24px; overflow: auto; font-size: 12px; line-height: 1.8; }
+  .lab-trace-note { color: var(--lab-sage); font-size: 10px; letter-spacing: .1em; }
+  .lab-trace-route { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+  .lab-trace-route li::before { content: none; }
+  .lab-trace-route li { margin: 0; }
+  button { font: inherit; cursor: pointer; }
+  .lab-trace-route button, .lab-trace-controls button { color: var(--lab-text); border: 1px solid var(--lab-border-bright); background: var(--lab-raised); padding: 8px 12px; }
+  button[aria-current], button:focus-visible { border-color: var(--lab-sage); color: var(--lab-bright); outline: 1px solid var(--lab-sage); }
+  .lab-trace-detail { min-height: 176px; padding: 20px; border: 1px solid var(--lab-border); background: var(--lab-surface); }
+  .lab-trace-detail h2 { font-size: 20px; color: var(--lab-bright); margin: 6px 0 12px; }
+  [hidden] { display: none; }
+  .lab-trace-controls { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; }
+  button:disabled { opacity: .4; cursor: default; }
+  .lab-trace-source { font-size: 10px; color: var(--lab-muted); }
+  @media (max-width: 600px) { .lab-trace-body { padding: 16px; } .lab-trace-detail { padding: 14px; } }
+</style>

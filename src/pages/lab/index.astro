@@ -1,7 +1,7 @@
 ---
 // Standalone page: /lab is the one route that becomes a full-viewport dark
 // desktop, so it does NOT use the site Layout (no header/footer).
-import { getCollection } from 'astro:content';
+import { getLabArticles } from '../../lib/labArticles';
 import { execFileSync } from 'node:child_process';
 import '../../styles/global.css';
 import '../../styles/lab.css';
@@ -12,9 +12,9 @@ import LabCompute from '../../components/lab/LabCompute.astro';
 import LabStorage from '../../components/lab/LabStorage.astro';
 import LabLog from '../../components/lab/LabLog.astro';
 import LabShell from '../../components/lab/LabShell.astro';
+import LabTrace from '../../components/lab/LabTrace.astro';
 
-const allPosts = await getCollection('lab', ({ data }) => !data.draft);
-const noscriptPosts = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const noscriptPosts = await getLabArticles();
 const astroVersion = Astro.generator.replace(/^Astro\s+v?/i, '');
 const buildDate = new Date().toISOString().slice(0, 10);
 
@@ -99,7 +99,7 @@ const gitCommit = resolveGitCommit();
           {noscriptPosts.length > 0 ? (
             <ul>
               {noscriptPosts.map((post) => (
-                <li><a href={`/lab/${post.slug}`}>{post.data.title}</a></li>
+                <li><a href={post.href}>{post.title}</a></li>
               ))}
             </ul>
           ) : (
@@ -119,37 +119,47 @@ const gitCommit = resolveGitCommit();
         <LabStorage />
         <LabLog />
       </div>
+      <LabTrace />
       <LabShell astroVersion={astroVersion} buildDate={buildDate} gitCommit={gitCommit} />
     </div>
 
     <script>
       import { initLabWindowManager } from '../../scripts/labWindowManager';
       import { initLabShell } from '../../scripts/labShell';
+      import { initLabDialogFocus } from '../../scripts/labDialogFocus';
+      initLabDialogFocus();
 
-      const bootEl = document.getElementById('lab-boot') as HTMLElement | null;
+      const bootEl = document.getElementById('lab-boot') as HTMLDialogElement | null;
       const bootBarFill = document.getElementById('lab-boot-bar-fill') as HTMLElement | null;
       const bootPct = document.getElementById('lab-boot-pct') as HTMLElement | null;
       const bootEnter = document.getElementById('lab-boot-enter') as HTMLButtonElement | null;
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+      function finishBoot() {
+        bootEl?.close();
+        if (bootEl) bootEl.hidden = true;
+        document.querySelector<HTMLButtonElement>('.lab-ws.active')?.focus();
+      }
+
       function hideBoot(instant: boolean) {
         if (!bootEl) return;
 
         if (instant || prefersReducedMotion) {
-          bootEl.hidden = true;
+          finishBoot();
           return;
         }
 
         bootEl.classList.add('lab-boot-fade');
         window.setTimeout(() => {
-          bootEl.hidden = true;
+          finishBoot();
         }, 200);
       }
 
       function showBoot() {
         if (!bootEl || !bootBarFill || !bootPct || !bootEnter) return;
         bootEl.hidden = false;
+        bootEl.showModal();
 
         if (prefersReducedMotion) {
           bootBarFill.classList.add('lab-boot-full');
@@ -184,10 +194,9 @@ const gitCommit = resolveGitCommit();
 
       bootEnter?.addEventListener('click', () => hideBoot(false));
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && bootEl && !bootEl.hidden) {
-          hideBoot(false);
-        }
+      bootEl?.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        hideBoot(false);
       });
 
       initLabWindowManager(prefersReducedMotion);

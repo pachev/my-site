@@ -1,5 +1,5 @@
 ---
-// Workspace 2: managed compute windows with launchers, tiling, focus, and drag-to-float.
+import { NODE_DATA, COMPUTE_IDS, SNAPSHOT_LABEL } from '../../data/labSnapshot';
 ---
 
 <section class="lab-scene lab-compute" data-scene="2" role="tabpanel" aria-label="Compute nodes">
@@ -11,63 +11,25 @@
     <button type="button" class="lab-node-launcher" data-open-node="s13-proxmox" aria-pressed="false">s13-proxmox</button>
   </div>
 
+  <p class="lab-snapshot-label">{SNAPSHOT_LABEL}<br />4 HOSTS · 24 CORES / 40 THREADS · 77.4 GiB RAM · 12 CONTAINERS + 2 VMs RUNNING</p>
   <div class="lab-tiles lab-window-layer" data-window-layer>
-    <div class="lab-window lab-tile lab-window-focused" data-managed-window data-window-mode="tiled" data-window-id="compute-ser5-proxmox" data-node="ser5-proxmox">
-      <div class="lab-titlebar"><span class="lab-tb-title">ser5-proxmox</span><button type="button" class="lab-tb-x" data-window-close aria-label="Close ser5-proxmox">✕</button></div>
-      <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HW</span><span class="lab-v">RYZEN 7 5850U · 16C · 27G</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:4%"></div></div><span class="lab-gval" data-gauge-value="cpu">4%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:70%"></div></div><span class="lab-gval" data-gauge-value="ram">70%</span></div>
-        <div class="lab-svc-head">GUESTS</div>
-        <div class="lab-svc"><span class="lab-dot"></span> coolify <span class="lab-svc-note">ships this very site</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> home-assistant <span class="lab-svc-note">vm 108</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> adguard <span class="lab-svc-note">dns for everything</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> excalidraw <span class="lab-svc-note">team whiteboard</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> forgejo <span class="lab-svc-note">ct 211 · git at home</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> atuin <span class="lab-svc-note">ct 110 · shell history</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> metrics <span class="lab-svc-note">ct 208 · victoriametrics</span></div>
-      </div>
-    </div>
-
-    <div class="lab-window lab-tile" data-managed-window data-window-mode="tiled" data-window-id="compute-pve-ser-24gb" data-node="pve-ser-24gb">
-      <div class="lab-titlebar"><span class="lab-tb-title">pve-ser-24gb</span><button type="button" class="lab-tb-x" data-window-close aria-label="Close pve-ser-24gb">✕</button></div>
-      <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HW</span><span class="lab-v">RYZEN 7 6800U · 16C · 19G</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:5%"></div></div><span class="lab-gval" data-gauge-value="cpu">5%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:27%"></div></div><span class="lab-gval" data-gauge-value="ram">27%</span></div>
-        <div class="lab-svc-head">GUESTS</div>
-        <div class="lab-svc"><span class="lab-dot"></span> katzenbase <span class="lab-svc-note">the second brain</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> immich <span class="lab-svc-note">nixos ct 206</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> mast <span class="lab-svc-note">lxc 200</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> hermes-agent <span class="lab-svc-note">lxc 109</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> github-runner <span class="lab-svc-note">ci, nixos ct 207</span></div>
-      </div>
-    </div>
-
-    <div class="lab-window lab-tile" data-managed-window data-window-mode="tiled" data-window-id="compute-security-pve" data-node="security-pve">
-      <div class="lab-titlebar"><span class="lab-tb-title">security-pve</span><button type="button" class="lab-tb-x" data-window-close aria-label="Close security-pve">✕</button></div>
-      <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HW</span><span class="lab-v">INTEL N150 · 4C · 15G · CORAL TPU</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:34%"></div></div><span class="lab-gval" data-gauge-value="cpu">34%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:31%"></div></div><span class="lab-gval" data-gauge-value="ram">31%</span></div>
-        <div class="lab-svc-head">GUESTS</div>
-        <div class="lab-svc"><span class="lab-dot"></span> frigate <span class="lab-svc-note">nixos ct 205 · 6 cameras</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> coral-tpu <span class="lab-svc-note">8.1ms inference</span></div>
-      </div>
-    </div>
-
-    <div class="lab-window lab-tile" data-managed-window data-window-mode="tiled" data-window-id="compute-s13-proxmox" data-node="s13-proxmox">
-      <div class="lab-titlebar"><span class="lab-tb-title">s13-proxmox</span><button type="button" class="lab-tb-x" data-window-close aria-label="Close s13-proxmox">✕</button></div>
-      <div class="lab-win-body">
-        <div class="lab-kv"><span class="lab-k">HW</span><span class="lab-v">INTEL N150 · 4C · 15G</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">CPU</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="cpu" style="width:2%"></div></div><span class="lab-gval" data-gauge-value="cpu">2%</span></div>
-        <div class="lab-gauge-row"><span class="lab-k">RAM</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill="ram" style="width:13%"></div></div><span class="lab-gval" data-gauge-value="ram">13%</span></div>
-        <div class="lab-svc-head">GUESTS</div>
-        <div class="lab-svc"><span class="lab-dot"></span> jellyfin <span class="lab-svc-note">nixos ct 212 · movies + tv</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> intel-gpu <span class="lab-svc-note">hardware transcoding</span></div>
-        <div class="lab-svc"><span class="lab-dot"></span> nas-library <span class="lab-svc-note">read-only media · local ssd cache</span></div>
-      </div>
-    </div>
+    {COMPUTE_IDS.map((id, i) => {
+      const node = NODE_DATA[id];
+      return (
+        <div class:list={['lab-window', 'lab-tile', { 'lab-window-focused': i === 0 }]} data-managed-window data-window-mode="tiled" data-window-id={`compute-${id}`} data-node={id}>
+          <div class="lab-titlebar"><span class="lab-tb-title">{id}</span><button type="button" class="lab-tb-x" data-window-close aria-label={`Close ${id}`}>✕</button></div>
+          <div class="lab-win-body">
+            <div class="lab-kv"><span class="lab-k">HW</span><span class="lab-v">{node.hw}</span></div>
+            {(['cpu', 'ram'] as const).map((metric) => (
+              <div class="lab-gauge-row"><span class="lab-k">{metric.toUpperCase()}</span><div class="lab-gauge"><div class="lab-gfill" data-gauge-fill={metric} style={`width:${node[metric]}%`}></div></div><span class="lab-gval" data-gauge-value={metric}>{node[metric]}%</span></div>
+            ))}
+            <div class="lab-svc-head">SERVICES IN SNAPSHOT</div>
+            {node.svcs.map(([name, note]) => <div class="lab-svc"><span class="lab-dot"></span> {name} <span class="lab-svc-note">{note}</span></div>)}
+            <div class="lab-win-foot">{node.foot}</div>
+          </div>
+        </div>
+      );
+    })}
   </div>
 
   <div class="lab-hintbar">CLICK TO FOCUS&nbsp;&nbsp;&middot;&nbsp;&nbsp;DRAG TO FLOAT&nbsp;&nbsp;&middot;&nbsp;&nbsp;SUPER+Q CLOSES FOCUSED</div>

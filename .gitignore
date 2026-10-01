@@ -24,3 +24,7 @@ pnpm-debug.log*
 .idea/
 
 **/.claude/settings.local.json
+
+# Browser regression artifacts
+/test-results/
+/playwright-report/

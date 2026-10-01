@@ -3,7 +3,7 @@
 // (under reduced motion the bar starts full with the button visible).
 ---
 
-<div class="lab-boot" id="lab-boot" hidden>
+<dialog class="lab-boot" id="lab-boot" aria-label="Enter the Lab" hidden>
   <div class="lab-boot-inner">
     <div class="lab-boot-logotype">PJ<span class="lab-us">_</span></div>
     <div class="lab-boot-init">initializing lab<span class="lab-boot-dots">...</span></div>
@@ -14,7 +14,7 @@
     <button type="button" class="lab-boot-enter" id="lab-boot-enter" hidden>ENTER SYSTEM</button>
     <div class="lab-boot-hints">ESC TO SKIP &nbsp;&middot;&nbsp; RESPECTS REDUCED MOTION</div>
   </div>
-</div>
+</dialog>
 
 <style>
   .lab-boot {

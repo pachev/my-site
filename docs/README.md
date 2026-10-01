@@ -18,6 +18,7 @@ How-to
 
 Reference
 
+- [Lab desktop](reference/lab-desktop.md)
 - [Post frontmatter and variant files](reference/post-frontmatter-and-variants.md)
 
 Explanation

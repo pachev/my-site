@@ -1,13 +1,10 @@
 ---
-// Workspace 4: journal terminal. Real articles (getCollection('lab')) render
-// as clickable rows; static system events record changes to the lab.
-import { getCollection } from 'astro:content';
-
-const allPosts = await getCollection('lab', ({ data }) => !data.draft);
-const articles = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+// Existing writing and dated deployment notes stay distinct.
+import { getLabArticles } from '../../lib/labArticles';
+const articles = await getLabArticles();
 
 const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+  new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'UTC' })
     .format(date)
     .toUpperCase()
     .replace(',', '');
@@ -17,7 +14,6 @@ const systemEvents = [
   { date: 'AUG 15 2026', message: 'Deployed excalidraw for fun. Even added a go wrapper to make a vault', warn: false },
   { date: 'AUG 14 2026', message: 'forgejo online in ct 211. Git at home, as intended', warn: false },
   { date: 'AUG 11 2026', message: 'Replaced Debian LXCs with NixOS containers: frigate, immich, github-runner', warn: false },
-  { date: 'AUG 11 2026', message: 'Deployed telegraf on every node, pointed at VictoriaMetrics. The lab has vitals now', warn: false },
   { date: 'AUG 10 2026', message: 'Destroyed palworld server. No survivors', warn: false },
   { date: 'AUG 09 2026', message: 'atuin in ct 110. Every shell command on every box, synced and searchable', warn: false },
   { date: 'AUG 06 2026', message: 'Migrated all NFS mounts from raw IPs to DNS names, then rebooted the whole cluster', warn: false },
@@ -32,11 +28,12 @@ const systemEvents = [
   <div class="lab-window lab-term">
     <div class="lab-prompt">$ journalctl -u pj-lab --since 2025 -f</div>
 
+    <div class="lab-stat-head">WRITING · BLOG + TIL + LAB</div>
     {articles.length > 0 ? (
       articles.map((post) => (
-        <a class="lab-entry lab-entry-article" href={`/lab/${post.slug}`}>
-          <span class="lab-edate">{formatDate(post.data.date)}</span>
-          <span class="lab-emsg">{post.data.title}</span>
+        <a class="lab-entry lab-entry-article" href={post.href}>
+          <span class="lab-edate">{formatDate(post.date)}</span>
+          <span class="lab-emsg">{post.title}</span>
           <span class="lab-eread">READ &rarr;</span>
         </a>
       ))
@@ -46,6 +43,8 @@ const systemEvents = [
       </div>
     )}
 
+    <div class="lab-stat-head lab-log-events">DEPLOYMENT NOTES</div>
+    <div class="lab-entry lab-entry-system"><span class="lab-edate">OCT 01 2026</span><span class="lab-emsg">Inventory snapshot: Telegraf on the NAS; Proxmox uses its built-in exporter. This is a current inventory note, not a deployment date.</span></div>
     {systemEvents.map((event) => (
       <div class:list={['lab-entry', 'lab-entry-system', { 'lab-entry-warn': event.warn }]}>
         <span class="lab-edate">{event.date}</span>
@@ -56,7 +55,7 @@ const systemEvents = [
     <div class="lab-cursor-line">$ <span class="lab-caret">▮</span></div>
   </div>
 
-  <div class="lab-hintbar">EACH ENTRY OPENS AS A REGULAR ARTICLE &mdash; LIGHT, READABLE, THE CALM SITE AGAIN.</div>
+  <div class="lab-hintbar">READ LINKS OPEN EXISTING WRITING &mdash; LIGHT, READABLE, THE CALM SITE AGAIN.</div>
 </section>
 
 <style>
@@ -145,12 +144,17 @@ const systemEvents = [
     color: var(--lab-muted);
   }
 
+  .lab-log-events { margin-top: 24px; }
+
+  .lab-entry-article:focus-visible { outline: 1px solid var(--lab-sage); }
+  .lab-entry-article:focus-visible .lab-eread { opacity: 1; }
+
   .lab-eread {
     margin-left: auto;
     font-size: 10px;
     letter-spacing: 0.2em;
     color: var(--lab-sage);
-    opacity: 0;
+    opacity: 1;
     flex-shrink: 0;
   }
 

@@ -1,0 +1,41 @@
+{
+  "kind": "demo",
+  "label": "DEMO PROCESSES \u00b7 illustrative values \u00b7 frozen, not live",
+  "processes": [
+    {
+      "pid": "demo-01",
+      "command": "coolify",
+      "cpuPercent": 7.2,
+      "memoryPercent": 12.5,
+      "state": "S"
+    },
+    {
+      "pid": "demo-02",
+      "command": "astro-static-server",
+      "cpuPercent": 4.1,
+      "memoryPercent": 3.6,
+      "state": "S"
+    },
+    {
+      "pid": "demo-03",
+      "command": "cloudflared",
+      "cpuPercent": 2.8,
+      "memoryPercent": 2.1,
+      "state": "S"
+    },
+    {
+      "pid": "demo-04",
+      "command": "telegraf",
+      "cpuPercent": 1.4,
+      "memoryPercent": 1.7,
+      "state": "S"
+    },
+    {
+      "pid": "demo-05",
+      "command": "demo-worker",
+      "cpuPercent": 0.8,
+      "memoryPercent": 4.4,
+      "state": "R"
+    }
+  ]
+}

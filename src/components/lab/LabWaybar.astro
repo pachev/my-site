@@ -17,6 +17,9 @@ const workspaces = [
         class="lab-ws"
         class:list={[{ active: i === 0 }]}
         data-workspace={ws.id}
+        id={`lab-tab-${ws.id}`}
+        aria-controls={`lab-scene-${ws.id}`}
+        tabindex={i === 0 ? 0 : -1}
         role="tab"
         aria-selected={i === 0 ? 'true' : 'false'}
       >
@@ -35,7 +38,7 @@ const workspaces = [
       aria-keyshortcuts="Space"
       title="[space] command palette"
     >&gt;_</button>
-    <span class="lab-dot"></span> 5 NODES&nbsp;&nbsp;&nbsp;ZFS 58%&nbsp;&nbsp;&nbsp;<span id="lab-clock">--:--</span>
+    <span class="lab-wb-status" title="Snapshot: October 1, 2026, 08:30–08:37 CDT; not live"><span class="lab-dot"></span> 5 NODES · ZFS 61%</span><span id="lab-clock">--:--</span>
     <a href="/" class="lab-wb-exit">EXIT →</a>
   </div>
 </div>

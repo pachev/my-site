@@ -1,15 +1,14 @@
 ---
 // Workspace 3: drive bays, ZFS pool reactor core, telemetry/exports/scrub.
+import { SNAPSHOT_LABEL } from '../../data/labSnapshot';
 const bays = [
-  { id: 'BAY 0', model: 'WD RED PLUS 4T' },
-  { id: 'BAY 1', model: 'WD RED PLUS 4T' },
-  { id: 'BAY 2', model: 'WD RED 4T' },
-  { id: 'BAY 3', model: 'WD RED 4T' },
+  { id: 'BAY 0', model: 'WD 4 TB' },
+  { id: 'BAY 1', model: 'WD 4 TB' },
 ];
 
 const exports = [
   { name: 'proxmox', note: 'cluster shared storage' },
-  { name: 'media', note: 'plex library' },
+  { name: 'media', note: 'Jellyfin library' },
   { name: 'pgdata', note: 'atuin · katzenbase' },
   { name: 'photos', note: 'immich' },
 ];
@@ -23,7 +22,7 @@ const exports = [
         <div class="lab-bay">
           <span class="lab-bay-id">{bay.id}</span>
           <span class="lab-bay-model">{bay.model}</span>
-          <span class="lab-bay-stat"><span class="lab-dot"></span> ONLINE</span>
+          <span class="lab-bay-stat"><span class="lab-dot"></span> MIRROR</span>
         </div>
       ))}
     </div>
@@ -33,26 +32,27 @@ const exports = [
         <div class="lab-core-inner">
           <div class="lab-core-label">ZFS POOL</div>
           <div class="lab-core-name">joseph-nas-1</div>
-          <div class="lab-core-pct">58%</div>
-          <div class="lab-core-sub">2.3T / 4.0T</div>
+          <div class="lab-core-pct">61%</div>
+          <div class="lab-core-sub">2.22 / 3.63 TiB</div>
         </div>
       </div></div></div>
-      <div class="lab-core-caption">THE CORE. IF THIS BLINKS RED, EVERYTHING ELSE IS DECORATION.</div>
+      <div class="lab-core-caption">TWO DRIVES. ONE MIRROR. CAPACITY IS A DATED SNAPSHOT.</div>
     </div>
 
     <div class="lab-stats">
-      <div class="lab-stat-head">POOL TELEMETRY</div>
-      <div class="lab-stat"><span class="lab-sk">ARC HIT</span><div class="lab-gauge"><div class="lab-gfill" style="width:98%"></div></div><span class="lab-sv">98.2%</span></div>
-      <div class="lab-stat"><span class="lab-sk">CAPACITY</span><div class="lab-gauge"><div class="lab-gfill" style="width:58%"></div></div><span class="lab-sv">58%</span></div>
-      <div class="lab-stat"><span class="lab-sk">FRAG</span><div class="lab-gauge"><div class="lab-gfill" style="width:11%"></div></div><span class="lab-sv">11%</span></div>
+      <div class="lab-snapshot-label">{SNAPSHOT_LABEL}</div>
+      <div class="lab-stat-head">POOL SNAPSHOT</div>
+      <div class="lab-stat"><span class="lab-sk">ARC HIT</span><div class="lab-gauge"><div class="lab-gfill" style="width:98.7%"></div></div><span class="lab-sv">98.7%</span></div>
+      <div class="lab-stat"><span class="lab-sk">CAPACITY</span><div class="lab-gauge"><div class="lab-gfill" style="width:61%"></div></div><span class="lab-sv">61%</span></div>
+      <div class="lab-stat"><span class="lab-sk">FRAG</span><div class="lab-gauge"><div class="lab-gfill" style="width:33%"></div></div><span class="lab-sv">33%</span></div>
 
-      <div class="lab-stat-head lab-stat-head-second">NFS EXPORTS</div>
+      <div class="lab-stat-head lab-stat-head-second">6 NFS EXPORT PATHS</div>
+      <div class="lab-scrub-note">4 Proxmox storage definitions · selected uses below</div>
       {exports.map((exp) => (
         <div class="lab-exp"><span class="lab-dot"></span> {exp.name} <span class="lab-exp-note">{exp.note}</span></div>
       ))}
 
-      <div class="lab-stat-head lab-stat-head-second">LAST SCRUB</div>
-      <div class="lab-scrub">0 ERRORS · 0B REPAIRED<br /><span class="lab-scrub-note">as it should be.</span></div>
+      <div class="lab-scrub-note">ARC hit: five-minute average. Allocation and fragmentation are dated readings, not live gauges.</div>
     </div>
   </div>
 
@@ -62,10 +62,10 @@ const exports = [
 <style>
   .lab-storage-scene {
     display: grid;
-    grid-template-columns: 360px 1fr 360px;
+    grid-template-columns: minmax(0, 1fr) 320px minmax(0, 1fr);
     align-items: center;
-    padding: 0 48px 56px;
-    gap: 32px;
+    padding: 24px clamp(16px, 3vw, 48px) 56px;
+    gap: clamp(16px, 2vw, 32px);
     min-height: calc(100% - 40px);
   }
 
@@ -85,10 +85,10 @@ const exports = [
   .lab-bay {
     border: 1px solid var(--lab-border);
     background: var(--lab-surface);
-    padding: 14px 16px;
+    padding: 14px 12px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -105,12 +105,14 @@ const exports = [
     font-size: 10px;
     letter-spacing: 0.18em;
     color: var(--lab-muted);
-    width: 48px;
+    flex-shrink: 0;
+    width: 42px;
   }
 
   .lab-bay-model {
     font-size: 12px;
     color: var(--lab-bright);
+    min-width: 0;
     letter-spacing: 0.06em;
   }
 
@@ -130,7 +132,7 @@ const exports = [
 
   .lab-ring {
     border: 1px solid var(--lab-border);
-    padding: 22px;
+    padding: 16px;
   }
 
   .lab-ring-2 {
@@ -143,8 +145,8 @@ const exports = [
   }
 
   .lab-core-inner {
-    width: 220px;
-    height: 220px;
+    width: 216px;
+    height: 216px;
     background: var(--lab-surface);
     display: flex;
     flex-direction: column;
@@ -223,6 +225,7 @@ const exports = [
     font-size: 11px;
     color: var(--lab-text);
     width: 46px;
+    flex-shrink: 0;
     text-align: right;
   }
 
@@ -239,6 +242,7 @@ const exports = [
     font-size: 10px;
     letter-spacing: 0.08em;
     margin-left: auto;
+    text-align: right;
   }
 
   .lab-scrub {
@@ -253,7 +257,7 @@ const exports = [
     font-size: 10px;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1100px) {
     .lab-storage-scene {
       grid-template-columns: 1fr;
       padding: 20px 16px 24px;

@@ -8,25 +8,23 @@ type Props = {
 const { astroVersion, buildDate, gitCommit } = Astro.props;
 ---
 
-<section
+<dialog
   class="lab-shell"
   id="lab-shell"
   data-astro-version={astroVersion}
   data-build-date={buildDate}
   data-git-commit={gitCommit}
-  role="dialog"
-  aria-modal="true"
   aria-labelledby="lab-shell-title"
   hidden
 >
-  <button type="button" class="lab-shell-backdrop" data-shell-close aria-label="Close command palette"></button>
+  <button type="button" class="lab-shell-backdrop" data-shell-close tabindex="-1" aria-label="Close command palette"></button>
   <div class="lab-window lab-shell-window">
     <div class="lab-titlebar">
       <span class="lab-tb-title" id="lab-shell-title">pj@lab: ~</span>
       <button type="button" class="lab-tb-x" data-shell-close aria-label="Close command palette">✕</button>
     </div>
     <div class="lab-shell-body">
-      <div class="lab-shell-output" data-shell-output aria-live="polite" aria-atomic="false">
+      <div class="lab-shell-output" data-shell-output tabindex="0" aria-label="Command output" aria-live="polite" aria-atomic="false">
         <div class="lab-shell-line lab-shell-muted">PJ LAB SHELL 0.3.0 · type <span class="lab-shell-command">help</span></div>
       </div>
       <form class="lab-shell-form" data-shell-form>
@@ -46,7 +44,7 @@ const { astroVersion, buildDate, gitCommit } = Astro.props;
       </form>
     </div>
   </div>
-</section>
+</dialog>
 
 <div class="lab-rebuild" id="lab-rebuild" role="status" aria-live="assertive" hidden>
   <div class="lab-rebuild-grid" aria-hidden="true"></div>

@@ -1,56 +1,6 @@
 import { gsap } from 'gsap';
 
-type NodeInfo = {
-  hw: string;
-  platform: string;
-  cpu: number;
-  ram: number;
-  svcs: [string, string][];
-  foot: string;
-};
-
-const NODE_DATA: Record<string, NodeInfo> = {
-  'security-pve': {
-    hw: 'INTEL N150 · 4C · 15G · CORAL TPU (USB)',
-    platform: 'PROXMOX VE 8.4 · KERNEL 6.14',
-    cpu: 34,
-    ram: 31,
-    svcs: [['frigate', 'nixos ct 205 · 6 cameras'], ['coral-tpu', 'inference 8.1ms']],
-    foot: '$ uptime → 13 days. do not jinx it.',
-  },
-  'ser5-proxmox': {
-    hw: 'RYZEN 7 5850U · 16C · 27G',
-    platform: 'PROXMOX VE 8.4 · KERNEL 6.11',
-    cpu: 4,
-    ram: 70,
-    svcs: [['coolify', 'ships this very site'], ['home-assistant', 'vm 108'], ['adguard', 'dns for everything'], ['excalidraw', 'team whiteboard'], ['forgejo', 'ct 211 · git at home'], ['atuin', 'ct 110 · shell history'], ['metrics', 'ct 208 · victoriametrics']],
-    foot: '$ uptime → 13 days. the elder node.',
-  },
-  'pve-ser-24gb': {
-    hw: 'RYZEN 7 6800U · 16C · 19G',
-    platform: 'PROXMOX VE 8.4 · KERNEL 6.8',
-    cpu: 5,
-    ram: 27,
-    svcs: [['katzenbase', 'the second brain'], ['immich', 'nixos ct 206'], ['mast', 'lxc 200'], ['hermes-agent', 'lxc 109'], ['github-runner', 'ci, nixos ct 207']],
-    foot: '$ uptime → 6 days. once took five power cycles. haunted.',
-  },
-  's13-proxmox': {
-    hw: 'INTEL N150 · 4C · 15G',
-    platform: 'PROXMOX VE 8.4 · KERNEL 6.14',
-    cpu: 2,
-    ram: 13,
-    svcs: [['jellyfin', 'nixos ct 212 · movies + tv'], ['intel-gpu', 'hardware transcoding'], ['nas-library', 'read-only media · local ssd cache']],
-    foot: '$ now playing → the spare node has a job.',
-  },
-  'joseph-nas': {
-    hw: 'RYZEN 5 · NODE 304 · 16G · ZFS 4×HDD',
-    platform: 'UBUNTU SERVER · NFS + ZFS',
-    cpu: 2,
-    ram: 67,
-    svcs: [['nfs', '4 exports'], ['telegraf', 'vitals to victoriametrics'], ['zpool scrub', '0 errors']],
-    foot: '$ uptime → 15.9 weeks. the adult in the room.',
-  },
-};
+import { NODE_DATA } from '../data/labSnapshot';
 
 type RectMap = Map<HTMLElement, DOMRect>;
 
@@ -261,29 +211,19 @@ export function initLabWindowManager(reducedMotion: boolean) {
     if (windowEl) openWindow(windowEl);
   }
 
-  function updateTelemetry(windowEl: HTMLElement, cpu: number, ram: number, animate = true) {
+  function updateTelemetry(windowEl: HTMLElement, cpu: number | null, ram: number | null, animate = true) {
     const values = { cpu, ram };
     (['cpu', 'ram'] as const).forEach((metric) => {
       const fill = windowEl.querySelector<HTMLElement>(`[data-gauge-fill="${metric}"]`);
       const label = windowEl.querySelector<HTMLElement>(`[data-gauge-value="${metric}"]`);
-      if (label) label.textContent = `${values[metric]}%`;
+      const value = values[metric];
+      if (label) label.textContent = value === null ? 'N/A' : `${value}%`;
       if (!fill) return;
       if (animate && !reducedMotion) {
-        gsap.to(fill, { width: `${values[metric]}%`, duration: 0.5, ease: 'power1.inOut', overwrite: true });
+        gsap.to(fill, { width: `${value ?? 0}%`, duration: 0.5, ease: 'power1.inOut', overwrite: true });
       } else {
-        fill.style.width = `${values[metric]}%`;
+        fill.style.width = `${value ?? 0}%`;
       }
-    });
-  }
-
-  function wiggleTelemetry() {
-    if (reducedMotion || document.hidden) return;
-    desktopRoot.querySelectorAll<HTMLElement>('[data-managed-window]:not([hidden])[data-node]').forEach((windowEl) => {
-      const info = NODE_DATA[windowEl.dataset.node ?? ''];
-      if (!info) return;
-      const cpu = Math.max(1, Math.min(99, info.cpu + Math.round(Math.random() * 6 - 3)));
-      const ram = Math.max(1, Math.min(99, info.ram + Math.round(Math.random() * 4 - 2)));
-      updateTelemetry(windowEl, cpu, ram);
     });
   }
 
@@ -374,6 +314,7 @@ export function initLabWindowManager(reducedMotion: boolean) {
       const active = button.dataset.workspace === id;
       button.classList.toggle('active', active);
       button.setAttribute('aria-selected', active ? 'true' : 'false');
+      button.tabIndex = active ? 0 : -1;
     });
 
     const incomingFocused = incoming.querySelector<HTMLElement>('.lab-window-focused:not([hidden])') ?? openWindows(incoming)[0];
@@ -401,7 +342,24 @@ export function initLabWindowManager(reducedMotion: boolean) {
     });
   }
 
-  workspaceButtons.forEach((button) => {
+  scenes.forEach((scene) => {
+    scene.id = `lab-scene-${scene.dataset.scene}`;
+    scene.setAttribute('aria-labelledby', `lab-tab-${scene.dataset.scene}`);
+  });
+
+  workspaceButtons.forEach((button, index) => {
+    button.addEventListener('keydown', (event) => {
+      let next: number;
+      if (event.key === 'ArrowRight') next = (index + 1) % workspaceButtons.length;
+      else if (event.key === 'ArrowLeft') next = (index + workspaceButtons.length - 1) % workspaceButtons.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = workspaceButtons.length - 1;
+      else return;
+      event.preventDefault();
+      const incoming = workspaceButtons[next];
+      activateWorkspace(incoming.dataset.workspace!);
+      incoming.focus();
+    });
     button.addEventListener('click', () => {
       if (button.dataset.workspace) activateWorkspace(button.dataset.workspace);
     });
@@ -417,7 +375,8 @@ export function initLabWindowManager(reducedMotion: boolean) {
 
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement | null;
-    if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+    if (event.defaultPrevented || document.querySelector('dialog[open]')) return;
+    if (target?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
 
     if (!event.metaKey && !event.ctrlKey && !event.altKey && ['1', '2', '3', '4'].includes(event.key)) {
       activateWorkspace(event.key);
@@ -431,5 +390,5 @@ export function initLabWindowManager(reducedMotion: boolean) {
 
   const initialWindow = desktopRoot.querySelector<HTMLElement>('[data-window-id="network-security-pve"]');
   if (initialWindow) focusWindow(initialWindow);
-  window.setInterval(wiggleTelemetry, 1800);
+
 }

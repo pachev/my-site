@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import { renderHtop } from './labHtop';
 
 const THEMES = ['sage', 'gruvbox', 'tokyo-night', 'nerv'] as const;
 type LabTheme = (typeof THEMES)[number];
@@ -22,7 +23,7 @@ type OutputTone = 'normal' | 'muted' | 'success' | 'warn' | 'error';
 
 export function initLabShell(reducedMotion: boolean) {
   const desktop = document.getElementById('lab-desktop');
-  const shell = document.getElementById('lab-shell');
+  const shell = document.querySelector<HTMLDialogElement>('#lab-shell');
   const input = shell?.querySelector<HTMLInputElement>('[data-shell-input]');
   const form = shell?.querySelector<HTMLFormElement>('[data-shell-form]');
   const output = shell?.querySelector<HTMLElement>('[data-shell-output]');
@@ -35,7 +36,7 @@ export function initLabShell(reducedMotion: boolean) {
   if (!desktop || !shell || !input || !form || !output || !rebuild || !rebuildTheme || !rebuildProgress || !rebuildLog || !konamiAlert) return;
 
   const root: HTMLElement = desktop;
-  const shellRoot: HTMLElement = shell;
+  const shellRoot: HTMLDialogElement = shell;
   const shellInput: HTMLInputElement = input;
   const shellOutput: HTMLElement = output;
   const rebuildRoot: HTMLElement = rebuild;
@@ -52,6 +53,7 @@ export function initLabShell(reducedMotion: boolean) {
   let activeTheme: LabTheme = 'sage';
   let lastFocused: HTMLElement | null = null;
   let rebuilding = false;
+  let closing = false;
   let historyIndex = 0;
   const history: string[] = [];
   const konamiBuffer: string[] = [];
@@ -110,6 +112,7 @@ export function initLabShell(reducedMotion: boolean) {
       '  sudo pacman -S personality            install missing personality',
       '  nixos-rebuild switch [theme]           rebuild; no theme cycles',
       '  nixos-rebuild switch --flake .#nerv   target a lab profile',
+      '  htop                                  host snapshot + demo processes',
       '  clear                                 clear the terminal',
       '',
       'THEMES  sage · gruvbox · tokyo-night · nerv',
@@ -192,6 +195,12 @@ export function initLabShell(reducedMotion: boolean) {
       shellOutput.replaceChildren();
       return;
     }
+    if (normalized === 'htop') {
+      const view = renderHtop();
+      shellOutput.append(view);
+      view.scrollIntoView({ block: 'start' });
+      return;
+    }
     if (normalized === 'fastfetch' || normalized === 'neofetch') {
       renderFastfetch();
       return;
@@ -225,7 +234,12 @@ export function initLabShell(reducedMotion: boolean) {
   function openShell() {
     if (!shellRoot.hidden) return;
     lastFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // Keep the cinematic above the native dialog's top layer while the shell is open.
+    shellRoot.append(rebuildRoot);
     shellRoot.hidden = false;
+    shellRoot.showModal();
+    gsap.killTweensOf(shellRoot.querySelector('.lab-shell-window'));
+    gsap.set(shellRoot.querySelector('.lab-shell-window'), { clearProps: 'opacity,transform' });
     if (!reducedMotion) {
       gsap.fromTo(shellRoot.querySelector('.lab-shell-window'), { opacity: 0, y: -18, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: 'back.out(1.5)', clearProps: 'opacity,transform' });
     }
@@ -233,11 +247,15 @@ export function initLabShell(reducedMotion: boolean) {
   }
 
   function closeShell() {
-    if (shellRoot.hidden) return;
+    if (shellRoot.hidden || closing) return;
+    closing = true;
     const finish = () => {
+      root.append(rebuildRoot);
+      shellRoot.close();
       shellRoot.hidden = true;
+      closing = false;
       shellInput.value = '';
-      lastFocused?.focus();
+      if (lastFocused?.isConnected) lastFocused.focus();
     };
     if (reducedMotion) {
       finish();
@@ -284,6 +302,8 @@ export function initLabShell(reducedMotion: boolean) {
     }
   });
 
+  shellRoot.addEventListener('cancel', (event) => { event.preventDefault(); closeShell(); });
+
   shellRoot.querySelectorAll<HTMLElement>('[data-shell-close]').forEach((button) => {
     button.addEventListener('click', closeShell);
   });
@@ -293,15 +313,11 @@ export function initLabShell(reducedMotion: boolean) {
     const target = event.target as HTMLElement | null;
     const editable = target?.matches('input, textarea, select, [contenteditable="true"]') ?? false;
 
-    if (event.key === 'Escape' && !shellRoot.hidden) {
-      event.preventDefault();
-      closeShell();
-      return;
-    }
-
-    if (event.code === 'Space' && shellRoot.hidden && !editable) {
-      const boot = document.getElementById('lab-boot');
-      if (boot && !boot.hidden) return;
+    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+    // Native dialogs own Escape, focus containment and background inertness.
+    if (document.querySelector('dialog[open]')) return;
+    const interactive = target?.closest('button, a, input, textarea, select, summary, [role="button"], [role="tab"], [contenteditable]:not([contenteditable="false"])');
+    if (event.code === 'Space' && shellRoot.hidden && !interactive) {
       event.preventDefault();
       openShell();
     }

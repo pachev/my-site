@@ -38,14 +38,13 @@ Quick notes and things I've learned along the way. Shorter than blog posts, focu
 
 ### Lab inventory
 
-`/lab` presents the homelab as an interactive desktop. Keep node summaries in
-`src/components/lab/LabNetwork.astro`, compute panels in `LabCompute.astro`,
-and the node inspector data in `src/scripts/labWindowManager.ts` consistent. Dated
-deployment notes belong in `LabLog.astro`.
-
-The S13 hosts Jellyfin in NixOS LXC 212, with Intel GPU transcoding and
-read-only NAS media mounts. CPU and RAM gauges are illustrative values,
-not live telemetry.
+`/lab` presents the homelab as an interactive desktop. Public node inventory and
+dated host readings live in `src/data/labSnapshot.ts`, shared by compute panels,
+network inspectors and the read-only `htop` command. Process demonstration rows
+are labeled separately in `src/data/lab-processes.json`. Metrics never imply a
+live connection. LOG links existing writing; deployment notes stay in
+`LabLog.astro`. See [Lab desktop](docs/reference/lab-desktop.md) for controls,
+data provenance, the architecture walkthrough and regression checks.
 
 ## Docs
 
